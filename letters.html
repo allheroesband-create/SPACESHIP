@@ -4,886 +4,743 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Letters</title>
+
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+   body {
+  font-family: system-ui, -apple-system,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+  background: radial-gradient(circle at top,#072c6b 0%,#001133 40%,#000814 100%);
+  color:#e8eeff;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;  /* ← stretch でもいいけど、上寄せの方が自然 */
+  overflow:auto;           /* ← hidden をやめてスクロールOKに */
+}
+
+    /* 暗転レイヤー（Ride Mode） */
+    #rideOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.45); /* ちょっと暗くするだけ */
+  /* backdrop-filter:blur(2px);  ← ボケるのが嫌なら消す */
+  opacity:0;
+  pointer-events:none;          /* ← ここが超重要：常にクリックを通す */
+  transition:opacity .25s;
+  z-index:50;
+}
+
+#rideOverlay.active{
+  opacity:1;
+  /* pointer-events は変えない */
+}
+
+
+    /* Ride用カーソル */
+    #rideCursor{
+      position:fixed;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:#fff;
+      filter:drop-shadow(0 0 6px #aee4ff);
+      mix-blend-mode:screen;
+      pointer-events:none;
+      opacity:0;
+      transition:opacity .2s;
+      z-index:200;
     }
 
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
-      background: radial-gradient(circle at top, #072c6b 0%, #001133 40%, #000814 100%);
-      color: #f5f7ff;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
+    .cursor-trail{
+      position:fixed;
+      width:6px;
+      height:6px;
+      border-radius:999px;
+      background:rgba(190,235,255,0.9);
+      mix-blend-mode:screen;
+      pointer-events:none;
+      z-index:150;
+      animation:trailFade .6s linear forwards;
+    }
+    @keyframes trailFade{
+      0%{opacity:1; transform:scale(1);}
+      100%{opacity:0; transform:scale(.2);}
     }
 
-    .app {
-      width: 100%;
-      max-width: 1200px;
-      margin: 16px;
-      border-radius: 24px;
-      background: rgba(0, 10, 30, 0.9);
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      border: 1px solid rgba(120, 170, 255, 0.15);
-      backdrop-filter: blur(12px);
+    .app{
+      width:100%;
+      max-width:1200px;
+      margin:16px;
+      border-radius:24px;
+      background:rgba(0,10,30,.92);
+      border:1px solid rgba(150,180,255,.2);
+      box-shadow:0 0 40px rgba(0,0,0,.6);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      z-index:10;
     }
 
-    header {
-      padding: 16px 24px;
-      border-bottom: 1px solid rgba(120, 170, 255, 0.18);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: linear-gradient(to right, rgba(10, 40, 90, 0.9), rgba(0, 10, 40, 0.9));
+    header{
+      padding:16px 24px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid rgba(120,170,255,.2);
+      background:linear-gradient(to right,rgba(10,40,90,.9),rgba(0,10,40,.9));
+    }
+    header h1{
+      font-size:24px;
+      letter-spacing:.25em;
+      text-transform:uppercase;
+    }
+    header .subtitle{font-size:12px;opacity:.7;}
+
+    #rideModeBtn{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 18px;
+      border:none;
+      border-radius:16px;
+      background:linear-gradient(135deg,#8ce8ff,#4bc0ff);
+      color:#00111a;
+      font-weight:700;
+      letter-spacing:.1em;
+      cursor:pointer;
+      box-shadow:0 0 14px rgba(120,200,255,.8);
+      transition:.2s;
+    }
+    #rideModeBtn:hover{
+      transform:translateY(-2px) scale(1.03);
+      box-shadow:0 0 20px rgba(150,220,255,1);
+    }
+    #rideModeBtn svg{width:18px;height:18px;fill:#00111a;}
+
+    main{
+      flex:1;
+      display:flex;
+      min-height:0;
+      overflow:hidden;
     }
 
-    header h1 {
-      font-size: 24px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
+    .galaxy-panel{
+      flex:1.2;
+      border-right:1px solid rgba(120,170,255,.2);
+      background:radial-gradient(circle at center,rgba(60,120,255,.15),rgba(0,8,30,1) 45%,#000814);
+      position:relative;
+      overflow:hidden;
+    }
+    #galaxy{width:100%;height:100%;display:block;}
+
+    .hint{
+      position:absolute;
+      left:16px;
+      bottom:10px;
+      font-size:11px;
+      opacity:.7;
+      pointer-events:none;
     }
 
-    header .subtitle {
-      font-size: 12px;
-      opacity: 0.7;
+    .letter-panel{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding:16px 18px;
+  gap:12px;
+  background:linear-gradient(to bottom,rgba(0,5,20,.9),rgba(0,0,0,.9));
+  /* overflow:hidden; ← これを削除 */
+}
+
+
+    .current-letter{
+      flex:1;
+      padding:14px;
+      border-radius:16px;
+      background:rgba(10,20,50,.92);
+      border:1px solid rgba(150,180,255,.25);
+      overflow:auto;
+    }
+    .letter-title{font-size:18px;font-weight:700;margin-top:8px;}
+    .letter-body{margin-top:10px;line-height:1.9;}
+
+    .color-dot{
+      display:inline-block;
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      margin-right:6px;
     }
 
-    main {
-      flex: 1;
-      display: flex;
-      min-height: 0;
+    .form-panel{
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid rgba(150,180,255,.25);
+      background:rgba(8,12,30,.95);
     }
 
-    .galaxy-panel {
-      flex: 1.2;
-      border-right: 1px solid rgba(120, 170, 255, 0.18);
-      position: relative;
-      overflow: hidden;
-      background: radial-gradient(circle at center, rgba(60, 120, 255, 0.15) 0%, rgba(0, 8, 30, 1) 45%, #000814 100%);
+    .form-row{display:flex;gap:8px;margin-bottom:8px;}
+    .field{flex:1;display:flex;flex-direction:column;font-size:12px;gap:4px;}
+
+    input,textarea{
+      border-radius:10px;
+      border:1px solid rgba(120,150,255,.35);
+      background:rgba(5,10,30,.9);
+      color:#e8eeff;
+      padding:6px 8px;
+      font-size:13px;
     }
 
-    #galaxy {
-      width: 100%;
-      height: 100%;
-      display: block;
+    textarea{
+      resize:vertical;
+      min-height:140px;
+      max-height:300px;
+      line-height:1.9;
     }
 
-    .hint {
-      position: absolute;
-      bottom: 10px;
-      left: 16px;
-      font-size: 11px;
-      opacity: 0.7;
-      pointer-events: none;
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:8px 16px;
+      background:linear-gradient(135deg,#4b8dff,#90c2ff);
+      cursor:pointer;
+      font-weight:600;
+      font-size:12px;
+      color:#00111a;
+      box-shadow:0 0 10px rgba(120,150,255,.6);
     }
 
-    .letter-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 16px 18px;
-      gap: 16px;
-      background: linear-gradient(to bottom, rgba(0, 5, 20, 0.9), rgba(0, 0, 0, 0.9));
+    #previewArea{
+      display:none;
+      margin-top:6px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(150,180,255,.35);
+      background:rgba(80,110,180,.14);
+      box-shadow:0 0 12px rgba(140,180,255,.25);
+      max-height:160px;
+      overflow:auto;
+      font-size:13px;
     }
 
-    .current-letter {
-      flex: 1;
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(10, 20, 50, 0.9);
-      border: 1px solid rgba(140, 180, 255, 0.2);
-      overflow: auto;
+    /* Story View（Ride の結果） */
+    #storyView{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.85);
+      backdrop-filter:blur(5px);
+      display:none;
+      z-index:300;
+      overflow-y:auto;
+      padding:40px 20px;
+    }
+    #storyView.show{display:block;}
+
+    #storyContainer{
+      max-width:620px;
+      margin:0 auto 60px;
     }
 
-    .current-letter h2 {
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: #cdd8ff;
-      margin-bottom: 8px;
-      opacity: 0.9;
+    .story-letter{
+      background:rgba(255,255,255,.08);
+      border-left:4px solid #9bd7ff;
+      border-radius:12px;
+      padding:16px;
+      margin-bottom:18px;
     }
 
-    .letter-meta {
-      font-size: 13px;
-      margin-bottom: 8px;
-      line-height: 1.7;
+    #closeStoryBtn{
+      position:fixed;
+      top:18px;
+      right:18px;
+      padding:8px 15px;
+      border-radius:999px;
+      border:none;
+      background:#9bd7ff;
+      color:#00111a;
+      font-weight:700;
+      cursor:pointer;
     }
 
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(180, 210, 255, 0.4);
-      margin-right: 6px;
-      margin-bottom: 4px;
-    }
-
-    .tag-label {
-      opacity: 0.6;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-    }
-
-    .letter-title {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 8px 0;
-      word-break: break-all;
-    }
-
-    .letter-body {
-      margin-top: 8px;
-      font-size: 13px;
-      line-height: 1.9;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .letter-empty {
-      font-size: 13px;
-      opacity: 0.7;
-      margin-top: 12px;
-    }
-
-    .color-dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 999px;
-      margin-right: 6px;
-      border: 1px solid rgba(0, 0, 0, 0.4);
-      vertical-align: -1px;
-    }
-
-    .form-panel {
-      padding: 12px 14px;
-      border-radius: 16px;
-      background: rgba(5, 10, 30, 0.95);
-      border: 1px solid rgba(120, 170, 255, 0.25);
-    }
-
-    .form-panel h3 {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      color: #cdd8ff;
-      margin-bottom: 10px;
-    }
-
-    .form-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .field {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
-    label {
-      font-size: 11px;
-      opacity: 0.7;
-    }
-
-    input[type="text"],
-    textarea,
-    input[type="color"] {
-      border-radius: 10px;
-      border: 1px solid rgba(130, 170, 255, 0.4);
-      background: rgba(5, 10, 30, 0.9);
-      color: #f5f7ff;
-      font-size: 13px;
-      padding: 6px 8px;
-      outline: none;
-    }
-
-    input[type="text"]:focus,
-    textarea:focus {
-      border-color: rgba(190, 220, 255, 0.9);
-      box-shadow: 0 0 0 1px rgba(150, 190, 255, 0.5);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 60px;
-      max-height: 140px;
-    }
-
-    input[type="color"] {
-      padding: 0;
-      height: 32px;
-      cursor: pointer;
-    }
-
-    .form-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 6px;
-    }
-
-    .btn {
-      border: none;
-      border-radius: 999px;
-      padding: 7px 14px;
-      font-size: 12px;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-weight: 600;
-      background: linear-gradient(135deg, #4b8dff, #90c2ff);
-      color: #020617;
-      box-shadow: 0 0 10px rgba(80, 150, 255, 0.5);
-    }
-
-    .btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 0 4px rgba(80, 150, 255, 0.5);
-    }
-
-    .reply-label {
-      font-size: 11px;
-      opacity: 0.7;
-    }
-
-    @media (max-width: 900px) {
-      main {
-        flex-direction: column;
-      }
-      .galaxy-panel {
-        height: 45vh;
-      }
-      .letter-panel {
-        height: 55vh;
-      }
+    @media (max-width:900px){
+      main{flex-direction:column;}
+      .galaxy-panel{height:45vh;}
+      .letter-panel{height:55vh;}
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <div>
-        <h1>LETTERS</h1>
-        <div class="subtitle">Space for chatting</div>
-      </div>
-    </header>
 
-    <main>
-      <!-- 銀河ビュー -->
-      <section class="galaxy-panel">
-        <svg id="galaxy"></svg>
-        <div class="hint">● click the node and read letters / You can write a new letter from the form</div>
-      </section>
+<div id="rideOverlay"></div>
+<div id="rideCursor"></div>
 
-      <!-- 右側：手紙表示 ＋ 投稿フォーム -->
-      <section class="letter-panel">
-        <div class="current-letter" id="currentLetter">
-          <h2>SELECTED LETTER</h2>
-          <div class="letter-empty">
-            There is no letter yet<br>
-            Please write the very first letter using the form at the bottom right.
-          </div>
-        </div>
+<div class="app">
+  <header>
+    <div>
+      <h1>LETTERS</h1>
+      <div class="subtitle">Space for chatting</div>
+    </div>
+    <button id="rideModeBtn">
+      <svg viewBox="0 0 24 24">
+        <path d="M2 12l20-8-8 20-2-8-8-4z"></path>
+      </svg>
+      RIDE MODE
+    </button>
+  </header>
 
-        <div class="form-panel">
-          <h3>WRITE A LETTER</h3>
-          <form id="letterForm">
-            <div class="form-row">
-              <div class="field">
-                <label for="fromName">From: (anonymous accepted)</label>
-                <input type="text" id="fromName" placeholder="e.g., Superman" required>
-              </div>
-              <div class="field">
-                <label for="toName">To: (the person you’re replying to)</label>
-                <input type="text" id="toName" placeholder="e.g., Mcqueen">
-              </div>
-            </div>
+  <main>
+    <section class="galaxy-panel">
+      <svg id="galaxy"></svg>
+      <div class="hint">● click → read letter / Ride Mode → trace the galaxy</div>
+    </section>
 
-            <div class="form-row">
-              <div class="field">
-                <label for="title">title</label>
-                <input type="text" id="title" placeholder="e.g., Red blood sun" required>
-              </div>
-              <div class="field" style="flex:0 0 110px;">
-                <label for="color">Letter color</label>
-                <input type="color" id="color" value="#ffb3ff">
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="body">body</label>
-              <textarea id="body" placeholder="Write your letter here" required></textarea>
-            </div>
-
-            <div class="form-footer">
-              <div class="reply-label" id="replyInfo">You are sending a new letter.</div>
-              <button type="submit" class="btn">Send</button>
-            </div>
-          </form>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <!-- Supabase クライアント読み込み -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    // ------------ Supabase 初期化 -------------
-    // ★ここを自分のプロジェクトの値に書き換える★
-    const SUPABASE_URL = "https://tovffzyfssluxmbzhctb.supabase.co"; // ← Project URL
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvdmZmenlmc3NsdXhtYnpoY3RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTE0MDAsImV4cCI6MjA4MDQyNzQwMH0.7SOXnMuCvo_d5L3YvpFdBIkmXzMg7QLGT3Tvmi-Ky8Q";        // ← anon public key
-
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    /** @type {Array<{id:string, fromName:string, toName:string, title:string, body:string, color:string, createdAt:number}>} */
-    let letters = [];
-    let selectedId = null;
-    let replyTargetName = null; // 返信時に自動で宛名に入れる用
-
-    // ------------ データ読み込み（Supabase） -------------
-
-    async function loadLetters() {
-      const { data, error } = await supabase
-        .from("letters")
-        .select("*")
-        .order("created_at", { ascending: true });
-
-      if (error) {
-        console.error("Failed to load letters:", error);
-        letters = [];
-        return;
-      }
-
-      letters = (data || []).map(row => ({
-        id: row.id,
-        fromName: row.from_name,
-        toName: row.to_name,
-        title: row.title,
-        body: row.body,
-        color: row.color || "#ffffff",
-        createdAt: new Date(row.created_at).getTime()
-      }));
-    }
-
-    // ------------ 銀河描画部分(SVG) -------------
-
-    function areConnected(a, b) {
-      const aFrom = (a.fromName || "").trim();
-      const aTo = (a.toName || "").trim();
-      const bFrom = (b.fromName || "").trim();
-      const bTo = (b.toName || "").trim();
-
-      if (!aFrom && !aTo && !bFrom && !bTo) return false;
-
-      return (
-        (aTo && aTo === bFrom) ||
-        (bTo && bTo === aFrom) ||
-        (aFrom && aFrom === bFrom && aFrom !== "") ||
-        (aTo && aTo === bTo && aTo !== "")
-      );
-    }
-
-    // 「ある手紙の宛名 = 誰かの差出人」なら、その手紙 → その相手、にビーム
-    function computeBeams() {
-      const beams = [];
-      letters.forEach((letter, i) => {
-        const toName = (letter.toName || "").trim();
-        if (!toName) return;
-        for (let j = 0; j < letters.length; j++) {
-          if (j === i) continue;
-          const other = letters[j];
-          const fromNameOther = (other.fromName || "").trim();
-          if (fromNameOther && fromNameOther === toName) {
-            beams.push({ from: i, to: j });
-            break;
-          }
-        }
-      });
-      return beams;
-    }
-
-    function renderGalaxy() {
-      const svg = document.getElementById("galaxy");
-      const rect = svg.getBoundingClientRect();
-      const width = rect.width || 600;
-      const height = rect.height || 400;
-
-      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
-      while (svg.firstChild) svg.removeChild(svg.firstChild);
-
-      if (!letters.length) return;
-
-      const svgNS = "http://www.w3.org/2000/svg";
-
-      // --- defs: 矢印・グロー ---
-      const defs = document.createElementNS(svgNS, "defs");
-
-      // arrow marker
-      const marker = document.createElementNS(svgNS, "marker");
-      marker.setAttribute("id", "arrowhead");
-      marker.setAttribute("markerWidth", "6");
-      marker.setAttribute("markerHeight", "6");
-      marker.setAttribute("refX", "5");
-      marker.setAttribute("refY", "3");
-      marker.setAttribute("orient", "auto");
-      marker.setAttribute("markerUnits", "strokeWidth");
-      const path = document.createElementNS(svgNS, "path");
-      path.setAttribute("d", "M0,0 L6,3 L0,6 Z");
-      path.setAttribute("fill", "#8dfbff");
-      path.setAttribute("fill-opacity", "0.98");
-      marker.appendChild(path);
-      defs.appendChild(marker);
-
-      // ビームのグロー
-      const beamGlow = document.createElementNS(svgNS, "filter");
-      beamGlow.setAttribute("id", "beamGlow");
-      beamGlow.setAttribute("x", "-50%");
-      beamGlow.setAttribute("y", "-50%");
-      beamGlow.setAttribute("width", "200%");
-      beamGlow.setAttribute("height", "200%");
-      let fe = document.createElementNS(svgNS, "feGaussianBlur");
-      fe.setAttribute("stdDeviation", "3.5");
-      fe.setAttribute("result", "blur");
-      beamGlow.appendChild(fe);
-      let fe2 = document.createElementNS(svgNS, "feColorMatrix");
-      fe2.setAttribute("in", "blur");
-      fe2.setAttribute("type", "matrix");
-      fe2.setAttribute(
-        "values",
-        "0 0 0 0 0.55  0 0 0 0 1  0 0 0 0 1  0 0 0 0.9 0"
-      );
-      beamGlow.appendChild(fe2);
-      defs.appendChild(beamGlow);
-
-      // ノードのグロー
-      const starGlow = document.createElementNS(svgNS, "filter");
-      starGlow.setAttribute("id", "starGlow");
-      starGlow.setAttribute("x", "-120%");
-      starGlow.setAttribute("y", "-120%");
-      starGlow.setAttribute("width", "340%");
-      starGlow.setAttribute("height", "340%");
-      let s1 = document.createElementNS(svgNS, "feGaussianBlur");
-      s1.setAttribute("stdDeviation", "3");
-      s1.setAttribute("result", "blur");
-      starGlow.appendChild(s1);
-      let s2 = document.createElementNS(svgNS, "feColorMatrix");
-      s2.setAttribute("in", "blur");
-      s2.setAttribute("type", "matrix");
-      s2.setAttribute(
-        "values",
-        "1 0 0 0 0.05  0 1 0 0 0.25  0 0 1 0 0.7  0 0 0 1 0"
-      );
-      starGlow.appendChild(s2);
-      defs.appendChild(starGlow);
-
-      svg.appendChild(defs);
-
-      // --- ノード位置計算（銀河スパイラル） ---
-      const centerX = width / 2;
-      const centerY = height / 2;
-      const goldenAngle = Math.PI * (3 - Math.sqrt(5));
-
-      const positions = letters.map((letter, i) => {
-        const radius = 30 + i * 12;
-        const angle = i * goldenAngle;
-        const x = centerX + Math.cos(angle) * radius;
-        const y = centerY + Math.sin(angle) * radius * 0.6;
-        return { x, y };
-      });
-
-      // --- 背景ライン（方向なし／薄い） ---
-      for (let i = 0; i < letters.length; i++) {
-        for (let j = i + 1; j < letters.length; j++) {
-          if (areConnected(letters[i], letters[j])) {
-            const line = document.createElementNS(svgNS, "line");
-            line.setAttribute("x1", positions[i].x);
-            line.setAttribute("y1", positions[i].y);
-            line.setAttribute("x2", positions[j].x);
-            line.setAttribute("y2", positions[j].y);
-            line.setAttribute("stroke", "#9fb4ff");
-            line.setAttribute("stroke-width", "0.45");
-            line.setAttribute("stroke-opacity", "0.14");
-            line.setAttribute("stroke-linecap", "round");
-            svg.appendChild(line);
-          }
-        }
-      }
-
-      // --- ビーム（光の粒の川） ---
-      const beams = computeBeams();
-      const beamNodes = new Set();
-      beams.forEach(b => {
-        beamNodes.add(b.from);
-        beamNodes.add(b.to);
-      });
-
-      beams.forEach(({ from, to }) => {
-        const x1 = positions[from].x;
-        const y1 = positions[from].y;
-        const x2 = positions[to].x;
-        const y2 = positions[to].y;
-        const dx = x2 - x1;
-        const dy = y2 - y1;
-
-        // 太いグローの本流
-        const glowLine = document.createElementNS(svgNS, "line");
-        glowLine.setAttribute("x1", x1);
-        glowLine.setAttribute("y1", y1);
-        glowLine.setAttribute("x2", x2);
-        glowLine.setAttribute("y2", y2);
-        glowLine.setAttribute("stroke", "#7ef5ff");
-        glowLine.setAttribute("stroke-width", "4");
-        glowLine.setAttribute("stroke-linecap", "round");
-        glowLine.setAttribute("stroke-opacity", "0.55");
-        glowLine.setAttribute("filter", "url(#beamGlow)");
-        svg.appendChild(glowLine);
-
-        // 中心ライン（うっすら）
-        const coreLine = document.createElementNS(svgNS, "line");
-        coreLine.setAttribute("x1", x1);
-        coreLine.setAttribute("y1", y1);
-        coreLine.setAttribute("x2", x2);
-        coreLine.setAttribute("y2", y2);
-        coreLine.setAttribute("stroke", "#e6ffff");
-        coreLine.setAttribute("stroke-width", "1");
-        coreLine.setAttribute("stroke-linecap", "round");
-        coreLine.setAttribute("stroke-opacity", "0.4");
-        coreLine.setAttribute("marker-end", "url(#arrowhead)");
-        svg.appendChild(coreLine);
-
-        // 光の粒たち
-        const particleCount = 10;
-        for (let p = 0; p < particleCount; p++) {
-          const t0 = Math.random() * 0.6; // 途中から湧く感じ
-          const t1 = t0 + 0.4 + Math.random() * 0.4;
-          const startX = x1 + dx * t0;
-          const startY = y1 + dy * t0;
-          const midX = x1 + dx * ((t0 + t1) / 2);
-          const midY = y1 + dy * ((t0 + t1) / 2);
-          const endX = x1 + dx * t1;
-          const endY = y1 + dy * t1;
-
-          const particle = document.createElementNS(svgNS, "circle");
-          particle.setAttribute("cx", startX);
-          particle.setAttribute("cy", startY);
-          particle.setAttribute("r", 0.9 + Math.random() * 1.8);
-          particle.setAttribute("fill", "#faffff");
-          const baseOpacity = 0.4 + Math.random() * 0.5;
-          particle.setAttribute("opacity", baseOpacity.toString());
-
-          const cxAnim = document.createElementNS(svgNS, "animate");
-          cxAnim.setAttribute("attributeName", "cx");
-          cxAnim.setAttribute("values", `${startX};${midX};${endX}`);
-          cxAnim.setAttribute("keyTimes", "0;0.5;1");
-          cxAnim.setAttribute("dur", (0.9 + Math.random() * 1.8).toFixed(2) + "s");
-          cxAnim.setAttribute("repeatCount", "indefinite");
-          cxAnim.setAttribute("begin", (Math.random() * 2).toFixed(2) + "s");
-          particle.appendChild(cxAnim);
-
-          const cyAnim = document.createElementNS(svgNS, "animate");
-          cyAnim.setAttribute("attributeName", "cy");
-          cyAnim.setAttribute("values", `${startY};${midY};${endY}`);
-          cyAnim.setAttribute("keyTimes", "0;0.5;1");
-          cyAnim.setAttribute("dur", cxAnim.getAttribute("dur"));
-          cyAnim.setAttribute("repeatCount", "indefinite");
-          cyAnim.setAttribute("begin", cxAnim.getAttribute("begin"));
-          particle.appendChild(cyAnim);
-
-          const opAnim = document.createElementNS(svgNS, "animate");
-          opAnim.setAttribute("attributeName", "opacity");
-          opAnim.setAttribute("values", `${baseOpacity};1;0;${baseOpacity}`);
-          opAnim.setAttribute("dur", (0.9 + Math.random() * 1.5).toFixed(2) + "s");
-          opAnim.setAttribute("repeatCount", "indefinite");
-          opAnim.setAttribute("begin", (Math.random() * 2).toFixed(2) + "s");
-          particle.appendChild(opAnim);
-
-          svg.appendChild(particle);
-        }
-      });
-
-      // --- ノード（恒星＋バチバチ） ---
-      letters.forEach((letter, index) => {
-        const g = document.createElementNS(svgNS, "g");
-        g.setAttribute("data-id", letter.id);
-        g.style.cursor = "pointer";
-
-        const isSelected = letter.id === selectedId;
-        const isHot = beamNodes.has(index);
-        const pos = positions[index];
-
-        // ハロ（反応する光）
-        const halo = document.createElementNS(svgNS, "circle");
-        halo.setAttribute("cx", pos.x);
-        halo.setAttribute("cy", pos.y);
-        halo.setAttribute("r", isSelected ? 22 : 18);
-        halo.setAttribute("fill", letter.color || "#ffffff");
-        halo.setAttribute("fill-opacity", isHot ? "0.7" : "0.45");
-        halo.setAttribute("filter", "url(#starGlow)");
-
-        // HOT なノードはバチバチアニメーション
-        if (isHot) {
-          const haloAnim = document.createElementNS(svgNS, "animate");
-          haloAnim.setAttribute("attributeName", "r");
-          haloAnim.setAttribute("values", `${isSelected ? 20 : 18};${(isSelected ? 26 : 23)};${isSelected ? 21 : 19}`);
-          haloAnim.setAttribute("dur", (0.9 + Math.random() * 0.8).toFixed(2) + "s");
-          haloAnim.setAttribute("repeatCount", "indefinite");
-          haloAnim.setAttribute("begin", (Math.random() * 1.5).toFixed(2) + "s");
-          halo.appendChild(haloAnim);
-
-          const opAnim = document.createElementNS(svgNS, "animate");
-          opAnim.setAttribute("attributeName", "fill-opacity");
-          opAnim.setAttribute("values", "0.25;0.9;0.4;0.75;0.25");
-          opAnim.setAttribute("dur", (1.1 + Math.random() * 0.9).toFixed(2) + "s");
-          opAnim.setAttribute("repeatCount", "indefinite");
-          opAnim.setAttribute("begin", (Math.random() * 1.5).toFixed(2) + "s");
-          halo.appendChild(opAnim);
-        }
-
-        g.appendChild(halo);
-
-        // 中心のコア
-        const circle = document.createElementNS(svgNS, "circle");
-        circle.setAttribute("cx", pos.x);
-        circle.setAttribute("cy", pos.y);
-        circle.setAttribute("r", isSelected ? 9 : 7);
-        circle.setAttribute("fill", letter.color || "#ffffff");
-        circle.setAttribute("fill-opacity", "1");
-        circle.setAttribute("stroke", "#ffffff");
-        circle.setAttribute("stroke-opacity", isSelected ? "1" : "0.8");
-        circle.setAttribute("stroke-width", isSelected ? "1.8" : "1.2");
-        g.appendChild(circle);
-
-        // 周りのスパーク
-        const baseSparkCount = isHot ? 9 : 5;
-        for (let s = 0; s < baseSparkCount; s++) {
-          const angle = Math.random() * Math.PI * 2;
-          const radius = (isSelected ? 18 : 15) + Math.random() * (isHot ? 7 : 4);
-          const sx = pos.x + Math.cos(angle) * radius;
-          const sy = pos.y + Math.sin(angle) * radius;
-
-          const spark = document.createElementNS(svgNS, "circle");
-          spark.setAttribute("cx", sx);
-          spark.setAttribute("cy", sy);
-          spark.setAttribute("r", 0.7 + Math.random() * (isHot ? 1.8 : 1.2));
-          spark.setAttribute("fill", "#f8fdff");
-          const baseOpacity = isHot
-            ? 0.4 + Math.random() * 0.5
-            : 0.2 + Math.random() * 0.4;
-          spark.setAttribute("opacity", baseOpacity.toString());
-          spark.setAttribute("filter", "url(#starGlow)");
-
-          const twinkle = document.createElementNS(svgNS, "animate");
-          twinkle.setAttribute("attributeName", "opacity");
-          twinkle.setAttribute(
-            "values",
-            isHot
-              ? `${baseOpacity};1;0.2;0.9;${baseOpacity}`
-              : `${baseOpacity};0.8;0.3;${baseOpacity}`
-          );
-          twinkle.setAttribute("dur", (isHot
-            ? 0.9 + Math.random() * 1.1
-            : 1.8 + Math.random() * 2.0).toFixed(2) + "s");
-          twinkle.setAttribute("repeatCount", "indefinite");
-          twinkle.setAttribute("begin", (Math.random() * 2).toFixed(2) + "s");
-          spark.appendChild(twinkle);
-
-          g.appendChild(spark);
-        }
-
-        // タイトルテキスト
-        const text = document.createElementNS(svgNS, "text");
-        text.setAttribute("x", pos.x + 10);
-        text.setAttribute("y", pos.y + 3);
-        text.setAttribute("font-size", "10");
-        text.setAttribute("fill", "#e5ebff");
-        text.setAttribute("opacity", "0.9");
-        text.textContent = letter.title || "(no title)";
-        g.appendChild(text);
-
-        g.addEventListener("click", () => {
-          selectLetter(letter.id);
-        });
-
-        svg.appendChild(g);
-      });
-    }
-
-    // ------------ 手紙表示 -------------
-
-    function selectLetter(id) {
-      selectedId = id;
-      const letter = letters.find(l => l.id === id);
-      const container = document.getElementById("currentLetter");
-
-      if (!letter) {
-        container.innerHTML = `
-          <h2>SELECTED LETTER</h2>
-          <div class="letter-empty">No letter was found</div>
-        `;
-        renderGalaxy();
-        return;
-      }
-
-      replyTargetName = letter.fromName || "";
-      updateReplyInfo();
-
-      const created = new Date(letter.createdAt || Date.now());
-      const dateStr = created.toLocaleString("ja-JP", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit"
-      });
-
-      container.innerHTML = `
+    <section class="letter-panel">
+      <div class="current-letter" id="currentLetter">
         <h2>SELECTED LETTER</h2>
-        <div class="letter-meta">
-          <div class="tag">
-            <span class="tag-label">FROM</span>
-            <span>${escapeHtml(letter.fromName || "名無し")}</span>
-          </div>
-          <div class="tag">
-            <span class="tag-label">TO</span>
-            <span>${escapeHtml(letter.toName || "（誰でも）")}</span>
-          </div>
-          <div class="tag">
-            <span class="tag-label">DATE</span>
-            <span>${dateStr}</span>
-          </div>
-        </div>
-        <div class="letter-title">
-          <span class="color-dot" style="background:${letter.color || "#ffffff"}"></span>
-          ${escapeHtml(letter.title || "")}
-        </div>
-        <div class="letter-body">
-          ${escapeHtml(letter.body || "").replace(/\n/g, "<br>")}
-        </div>
-      `;
+        <p style="opacity:.7;">There is no letter yet — write the first one.</p>
+      </div>
 
-      const toInput = document.getElementById("toName");
-      if (replyTargetName) {
-        toInput.value = replyTargetName;
-      }
+      <div id="previewArea"></div>
 
-      renderGalaxy();
+      <div class="form-panel">
+        <form id="letterForm">
+          <div class="form-row">
+            <div class="field">
+              <label for="fromName">From:</label>
+              <input id="fromName" required>
+            </div>
+            <div class="field">
+              <label for="toName">To:</label>
+              <input id="toName">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="title">Title:</label>
+              <input id="title" required>
+            </div>
+            <div class="field" style="flex:0 0 110px;">
+              <label for="color">Color:</label>
+              <input type="color" id="color" value="#ffb3ff">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="body">Body:</label>
+            <textarea id="body" required></textarea>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button type="button" id="previewBtn" class="btn" style="background:#6b6bff;">PREVIEW</button>
+            <button type="submit" class="btn">SEND</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="storyView">
+  <button id="closeStoryBtn">Close ride</button>
+  <div id="storyContainer"></div>
+</div>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ===== Supabase 初期化 =====
+  const SUPABASE_URL = "https://tovffzyfssluxmbzhctb.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvdmZmenlmc3NsdXhtYnpoY3RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTE0MDAsImV4cCI6MjA4MDQyNzQwMH0.7SOXnMuCvo_d5L3YvpFdBIkmXzMg7QLGT3Tvmi-Ky8Q";
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let letters = [];
+  let selectedId = null;
+  let rideOn = false;
+  let rideTraceIds = [];
+  let lastCursorX = 0;
+  let lastCursorY = 0;
+
+  const rideOverlay = document.getElementById("rideOverlay");
+  const rideCursor = document.getElementById("rideCursor");
+
+  // ===== 手紙ロード =====
+  async function loadLetters() {
+    const { data, error } = await supabase
+      .from("letters")
+      .select("*")
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error("Supabase load error:", error);
+      letters = [];
+      return;
     }
 
-    function updateReplyInfo() {
-      const info = document.getElementById("replyInfo");
-      if (replyTargetName) {
-        info.textContent = `It’s okay to send this as a reply to the currently selected letter (from: ${replyTargetName}).`;
-      } else {
-        info.textContent = "You are sending a new letter.";
-      }
+    letters = (data || []).map(row => ({
+      id: row.id,
+      fromName: row.from_name,
+      toName: row.to_name,
+      title: row.title,
+      body: row.body,
+      color: row.color || "#ffffff",
+      createdAt: new Date(row.created_at).getTime()
+    }));
+
+    renderGalaxy();
+    if (letters.length) {
+      selectLetter(letters[letters.length - 1].id);
     }
+  }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
+  // ===== 銀河配置 =====
+  function computePositions(w,h){
+    const cx = w/2, cy=h/2;
+    const golden = Math.PI*(3-Math.sqrt(5));
+    return letters.map((_,i)=>{
+      const r = 40 + i*16;
+      const a = i*golden;
+      return {
+        x: cx + Math.cos(a)*r,
+        y: cy + Math.sin(a)*r*0.6
+      };
+    });
+  }
 
-    // ------------ フォーム送信（Supabaseに保存） -------------
+  function areConnected(a,b){
+    const af=(a.fromName||"").trim();
+    const at=(a.toName||"").trim();
+    const bf=(b.fromName||"").trim();
+    const bt=(b.toName||"").trim();
+    return (
+      (at && at===bf) ||
+      (bt && bt===af)
+    );
+  }
 
-    function setupForm() {
-      const form = document.getElementById("letterForm");
-      const fromInput = document.getElementById("fromName");
-      const toInput = document.getElementById("toName");
-      const titleInput = document.getElementById("title");
-      const colorInput = document.getElementById("color");
-      const bodyInput = document.getElementById("body");
+  function computeBeams(){
+    const beams=[];
+    letters.forEach((L,i)=>{
+      const to=(L.toName||"").trim();
+      if(!to) return;
+      const j = letters.findIndex(other => (other.fromName||"").trim()===to);
+      if(j>=0) beams.push({from:i,to:j});
+    });
+    return beams;
+  }
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+  // ===== 銀河描画 =====
+  function renderGalaxy(){
+    const svg = document.getElementById("galaxy");
+    const rect = svg.getBoundingClientRect();
+    const W = rect.width || 800;
+    const H = rect.height || 600;
 
-        const fromName = fromInput.value.trim();
-        const toName = toInput.value.trim();
-        const title = titleInput.value.trim();
-        const body = bodyInput.value.trim();
-        const color = colorInput.value || "#ffffff";
+    svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    if(!letters.length) return;
 
-        if (!fromName || !title || !body) {
-          alert("差出人・タイトル・本文は必須です。");
-          return;
+    const svgNS = "http://www.w3.org/2000/svg";
+    const positions = computePositions(W,H);
+
+    // 背景薄線
+    for(let i=0;i<letters.length;i++){
+      for(let j=i+1;j<letters.length;j++){
+        if(areConnected(letters[i],letters[j])){
+          const l = document.createElementNS(svgNS,"line");
+          l.setAttribute("x1",positions[i].x);
+          l.setAttribute("y1",positions[i].y);
+          l.setAttribute("x2",positions[j].x);
+          l.setAttribute("y2",positions[j].y);
+          l.setAttribute("stroke","#9fb4ff");
+          l.setAttribute("stroke-width","0.6");
+          l.setAttribute("stroke-opacity","0.18");
+          svg.appendChild(l);
         }
+      }
+    }
 
-        const { data, error } = await supabase
-          .from("letters")
-          .insert({
-            from_name: fromName,
-            to_name: toName || null,
-            title: title,
-            body: body,
-            color: color
-          })
-          .select()
-          .single();
+    // 光の川ビーム
+    const beams = computeBeams();
+    beams.forEach(({from,to})=>{
+      const p1=positions[from], p2=positions[to];
+      createBeam(svg,p1.x,p1.y,p2.x,p2.y);
+    });
 
-        if (error) {
-          console.error("Failed to insert letter:", error);
-          alert("Failed to send the letter. Please try again later.");
-          return;
+    // ノード
+    letters.forEach((L,i)=>{
+      const g = document.createElementNS(svgNS,"g");
+      g.style.cursor="pointer";
+
+      const pos = positions[i];
+      const isSelected = (L.id===selectedId);
+
+      const halo = document.createElementNS(svgNS,"circle");
+      halo.setAttribute("cx",pos.x);
+      halo.setAttribute("cy",pos.y);
+      halo.setAttribute("r", isSelected?20:16);
+      halo.setAttribute("fill",L.color);
+      halo.setAttribute("fill-opacity","0.35");
+      g.appendChild(halo);
+
+      const c = document.createElementNS(svgNS,"circle");
+      c.setAttribute("cx",pos.x);
+      c.setAttribute("cy",pos.y);
+      c.setAttribute("r", isSelected?8:6);
+      c.setAttribute("fill",L.color);
+      c.setAttribute("stroke","#fff");
+      c.setAttribute("stroke-width","1.3");
+      g.appendChild(c);
+
+      const t = document.createElementNS(svgNS,"text");
+      t.setAttribute("x",pos.x+10);
+      t.setAttribute("y",pos.y+3);
+      t.setAttribute("fill","#e7ecff");
+      t.setAttribute("font-size","10");
+      t.textContent = L.title || "(no title)";
+      g.appendChild(t);
+
+      g.addEventListener("click",()=>{ selectLetter(L.id); });
+
+      // Ride中：なぞった順を記録（pointerenter）
+      g.addEventListener("pointerenter",()=>{
+        if(rideOn && !rideTraceIds.includes(L.id)){
+          rideTraceIds.push(L.id);
         }
-
-        const letter = {
-          id: data.id,
-          fromName: data.from_name,
-          toName: data.to_name,
-          title: data.title,
-          body: data.body,
-          color: data.color || "#ffffff",
-          createdAt: new Date(data.created_at).getTime()
-        };
-
-        letters.push(letter);
-        renderGalaxy();
-        selectLetter(letter.id);
-
-        titleInput.value = "";
-        bodyInput.value = "";
       });
+
+      svg.appendChild(g);
+    });
+  }
+
+  // 光の川
+  function createBeam(svg,x1,y1,x2,y2){
+    const svgNS = "http://www.w3.org/2000/svg";
+    const dx=x2-x1, dy=y2-y1;
+
+    const glow = document.createElementNS(svgNS,"line");
+    glow.setAttribute("x1",x1);
+    glow.setAttribute("y1",y1);
+    glow.setAttribute("x2",x2);
+    glow.setAttribute("y2",y2);
+    glow.setAttribute("stroke","rgba(120,230,255,0.35)");
+    glow.setAttribute("stroke-width","5");
+    glow.setAttribute("stroke-linecap","round");
+    svg.appendChild(glow);
+
+    const core = document.createElementNS(svgNS,"line");
+    core.setAttribute("x1",x1);
+    core.setAttribute("y1",y1);
+    core.setAttribute("x2",x2);
+    core.setAttribute("y2",y2);
+    core.setAttribute("stroke","rgba(230,255,255,0.7)");
+    core.setAttribute("stroke-width","1.3");
+    core.setAttribute("stroke-linecap","round");
+    svg.appendChild(core);
+
+    const count=14;
+    for(let i=0;i<count;i++){
+      const t0=Math.random()*0.6;
+      const t1=t0+0.3+Math.random()*0.4;
+      const sx=x1+dx*t0, sy=y1+dy*t0;
+      const mx=x1+dx*((t0+t1)/2), my=y1+dy*((t0+t1)/2);
+      const ex=x1+dx*t1, ey=y1+dy*t1;
+
+      const p = document.createElementNS(svgNS,"circle");
+      p.setAttribute("cx",sx);
+      p.setAttribute("cy",sy);
+      p.setAttribute("r",1+Math.random()*1.8);
+      p.setAttribute("fill","#fff");
+      p.setAttribute("opacity","0.4");
+      svg.appendChild(p);
+
+      const aX=document.createElementNS(svgNS,"animate");
+      aX.setAttribute("attributeName","cx");
+      aX.setAttribute("values",`${sx};${mx};${ex}`);
+      aX.setAttribute("dur",(1+Math.random()).toFixed(2)+"s");
+      aX.setAttribute("repeatCount","indefinite");
+      aX.setAttribute("begin",(Math.random()*2).toFixed(2)+"s");
+      p.appendChild(aX);
+
+      const aY=document.createElementNS(svgNS,"animate");
+      aY.setAttribute("attributeName","cy");
+      aY.setAttribute("values",`${sy};${my};${ey}`);
+      aY.setAttribute("dur",aX.getAttribute("dur"));
+      aY.setAttribute("repeatCount","indefinite");
+      aY.setAttribute("begin",aX.getAttribute("begin"));
+      p.appendChild(aY);
+    }
+  }
+
+  // ===== 手紙表示 =====
+  function selectLetter(id){
+    selectedId = id;
+    const L = letters.find(l=>l.id===id);
+    const box = document.getElementById("currentLetter");
+    if(!L){
+      box.innerHTML = "<h2>SELECTED LETTER</h2><p>No letter.</p>";
+      return;
     }
 
-    // ------------ 初期化 -------------
+    const dateStr = new Date(L.createdAt).toLocaleString("ja-JP");
+    box.innerHTML = `
+      <h2>SELECTED LETTER</h2>
+      <div class="letter-title">
+        <span class="color-dot" style="background:${L.color}"></span>
+        ${L.title}
+      </div>
+      <div class="letter-body">
+        <b>FROM:</b> ${L.fromName || "名無し"}<br>
+        <b>TO:</b> ${L.toName || "(anyone)"}<br>
+        <b>DATE:</b> ${dateStr}<br><br>
+        ${L.body.replace(/\n/g,"<br>")}
+      </div>
+    `;
+    renderGalaxy();
+  }
 
-    async function init() {
-      await loadLetters();
-      setupForm();
-      renderGalaxy();
-      updateReplyInfo();
+  // ===== Ride Mode ON/OFF =====
+  document.getElementById("rideModeBtn").addEventListener("click",()=>{
+    rideOn = !rideOn;
+    rideOverlay.classList.toggle("active",rideOn);
+    rideCursor.style.opacity = rideOn?1:0;
 
-      if (letters.length) {
-        const last = letters[letters.length - 1];
-        selectLetter(last.id);
+    if(!rideOn){
+      // Ride 終了 → トレースした順でStory表示
+      if(rideTraceIds.length>0){
+        openStoryView();
       }
+    }else{
+      rideTraceIds = [];
+    }
+  });
+
+  document.addEventListener("pointermove",(e)=>{
+    lastCursorX = e.clientX;
+    lastCursorY = e.clientY;
+    if(!rideOn) return;
+
+    rideCursor.style.left = e.clientX+"px";
+    rideCursor.style.top  = e.clientY+"px";
+
+    const trail = document.createElement("div");
+    trail.className="cursor-trail";
+    trail.style.left = e.clientX+"px";
+    trail.style.top  = e.clientY+"px";
+    document.body.appendChild(trail);
+    setTimeout(()=>trail.remove(),600);
+  });
+
+  // ===== Ride Story View =====
+  function openStoryView(){
+    const container = document.getElementById("storyContainer");
+    container.innerHTML = "";
+
+    rideTraceIds.forEach(id=>{
+      const L = letters.find(l=>l.id===id);
+      if(!L) return;
+      const div = document.createElement("div");
+      div.className="story-letter";
+      div.innerHTML = `
+        <h3><span class="color-dot" style="background:${L.color}"></span>${L.title}</h3>
+        <div style="opacity:.7;font-size:12px;margin-bottom:8px;">
+          FROM: ${L.fromName || "名無し"} / TO: ${L.toName || "(anyone)"}
+        </div>
+        <div>${L.body.replace(/\n/g,"<br>")}</div>
+      `;
+      container.appendChild(div);
+    });
+
+    document.getElementById("storyView").classList.add("show");
+    rideTraceIds = [];
+  }
+
+  document.getElementById("closeStoryBtn").addEventListener("click",()=>{
+    document.getElementById("storyView").classList.remove("show");
+  });
+
+  // ===== PREVIEW =====
+  document.getElementById("previewBtn").addEventListener("click",()=>{
+    const from = document.getElementById("fromName").value.trim();
+    const to   = document.getElementById("toName").value.trim();
+    const title= document.getElementById("title").value.trim();
+    const body = document.getElementById("body").value.trim();
+    const color= document.getElementById("color").value;
+
+    if(!from || !title || !body){
+      alert("From / Title / Body を入力してね。");
+      return;
     }
 
-    window.addEventListener("load", () => {
-      init();
+    const box = document.getElementById("previewArea");
+    box.style.display="block";
+    box.innerHTML = `
+      <div style="font-size:11px;opacity:.7;margin-bottom:4px;">PREVIEW</div>
+      <div><span class="color-dot" style="background:${color}"></span><b>${title}</b></div>
+      <div style="font-size:12px;opacity:.7;margin:4px 0 6px;">
+        FROM: ${from} / TO: ${to || "(anyone)"}
+      </div>
+      <div>${body.replace(/\n/g,"<br>")}</div>
+    `;
+  });
+
+  // ===== フォーム送信 =====
+  document.getElementById("letterForm").addEventListener("submit",async (e)=>{
+    e.preventDefault();
+
+    const from = document.getElementById("fromName").value.trim();
+    const to   = document.getElementById("toName").value.trim();
+    const title= document.getElementById("title").value.trim();
+    const body = document.getElementById("body").value.trim();
+    const color= document.getElementById("color").value;
+
+    if(!from || !title || !body){
+      alert("From / Title / Body は必須です。");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("letters")
+      .insert({
+        from_name: from,
+        to_name: to || null,
+        title,
+        body,
+        color
+      })
+      .select()
+      .single();
+
+    if(error){
+      console.error("Supabase insert error:", error);
+      alert("送信に失敗しました。");
+      return;
+    }
+
+    // 追加した分をローカルにも反映
+    letters.push({
+      id: data.id,
+      fromName: data.from_name,
+      toName: data.to_name,
+      title: data.title,
+      body: data.body,
+      color: data.color || "#ffffff",
+      createdAt: new Date(data.created_at).getTime()
     });
 
-    window.addEventListener("resize", () => {
-      renderGalaxy();
-    });
-  </script>
+    document.getElementById("previewArea").style.display="none";
+    document.getElementById("title").value="";
+    document.getElementById("body").value="";
+
+    renderGalaxy();
+    selectLetter(data.id);
+  });
+
+  // ===== init =====
+  window.addEventListener("load",()=>{
+    loadLetters();
+  });
+</script>
 </body>
 </html>
