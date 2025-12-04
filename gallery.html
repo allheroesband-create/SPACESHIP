@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <title>camera roll</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #050509;
+      color: #f5f5f5;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 1.6rem;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.2rem;
+    }
+    p {
+      margin-top: 0;
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+    .grid {
+      margin-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+    }
+    .item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      aspect-ratio: 1 / 1;
+      cursor: pointer;
+    }
+    .item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.25s ease-out;
+    }
+    .item:hover img {
+      transform: scale(1.05);
+    }
+    .empty {
+      margin-top: 20px;
+      opacity: 0.6;
+      font-size: 0.9rem;
+    }
+    #status {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>camera roll</h1>
+  <p>eternaly</p>
+
+  <div id="status">now loading…</div>
+  <div id="gallery" class="grid"></div>
+
+  <div id="lightbox" class="lightbox">
+    <img id="lightbox-img" src="" alt="" />
+  </div>
+
+  <script type="module">
+    const SUPABASE_URL = "https://tovffzyfssluxmbzhctb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvdmZmenlmc3NsdXhtYnpoY3RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTE0MDAsImV4cCI6MjA4MDQyNzQwMH0.7SOXnMuCvo_d5L3YvpFdBIkmXzMg7QLGT3Tvmi-Ky8Q";
+    const BUCKET = "camera roll";
+
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const gallery = document.getElementById("gallery");
+    const statusEl = document.getElementById("status");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImg = document.getElementById("lightbox-img");
+
+    async function loadImages() {
+      statusEl.textContent = "now loading...";
+
+      const { data, error } = await supabase.storage
+        .from(BUCKET)
+        .list("", {
+          limit: 200,
+          offset: 0,
+          sortBy: { column: "created_at", order: "desc" },
+        });
+
+      console.log("LIST RESULT", { data, error, bucket: BUCKET });
+
+      if (error) {
+        console.error(error);
+        statusEl.textContent = "error: " + error.message;
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        statusEl.textContent = "";
+        gallery.innerHTML = '<div class="empty">まだ画像がありません。アップロードしてみて。</div>';
+        return;
+      }
+
+      statusEl.textContent = "";
+      gallery.innerHTML = "";
+
+      for (const item of data) {
+        if (!item.name) continue;
+
+        const { data: urlData } = supabase.storage
+          .from(BUCKET)
+          .getPublicUrl(item.name);
+
+        const div = document.createElement("div");
+        div.className = "item";
+
+        const img = document.createElement("img");
+        img.src = urlData.publicUrl;
+        img.alt = item.name;
+
+        div.addEventListener("click", () => {
+          lightboxImg.src = urlData.publicUrl;
+          lightbox.style.display = "flex";
+        });
+
+        div.appendChild(img);
+        gallery.appendChild(div);
+      }
+    }
+
+    lightbox.addEventListener("click", () => {
+      lightbox.style.display = "none";
+      lightboxImg.src = "";
+    });
+
+    loadImages();
+  </script>
+</body>
+</html>
