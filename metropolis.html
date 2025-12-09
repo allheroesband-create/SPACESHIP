@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPACESHIP</title>
+
+    <style>
+/* --- カーソル：ベース --- */
+body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
+
+/* カーソル本体 */
+#cursor {
+  position: fixed;
+  left: 0; top: 0;
+  width: 14px; height: 14px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2147483647; /* 最前面 */
+  background: radial-gradient(circle, #fff 0%, #fff 40%, #ffeecc 70%, transparent 100%);
+  box-shadow: 0 0 12px #fff, 0 0 24px #fff, 0 0 36px #ffeecc;
+  clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  animation: starMorph 2s ease-in-out infinite;
+  will-change: transform, left, top;
+  pointer-events: none;
+}
+
+/* 星のゆらぎ */
+@keyframes starMorph {
+  0%,100% { clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+  25% { clip-path: polygon(50% 5%,65% 30%,95% 40%,70% 55%,85% 90%,50% 75%,15% 90%,30% 55%,5% 40%,35% 30%); }
+  50% { clip-path: polygon(50% 2%,58% 38%,96% 32%,66% 60%,82% 88%,50% 68%,18% 88%,34% 60%,4% 32%,42% 38%); }
+  75% { clip-path: polygon(50% 8%,63% 33%,92% 38%,72% 58%,77% 93%,50% 72%,23% 93%,28% 58%,8% 38%,37% 33%); }
+}
+
+/* 軌跡 */
+.cursor-trail {
+  position: fixed;
+  left: 0; top: 0;
+  width: 6px; height: 6px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2147483646;
+  background: radial-gradient(circle, rgba(255,255,255,0.95), rgba(255,255,255,0.6) 30%, transparent 80%);
+  will-change: transform, opacity;
+  animation: trailFade 900ms cubic-bezier(.22,.9,.3,1) forwards;
+}
+
+/* 軌跡フェード（短めで視認性良く） */
+@keyframes trailFade {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+}
+
+/* デバッグ枠（必要なら有効に） */
+/* #cursor { outline: 1px solid rgba(255,255,255,0.08); } */
+</style>
+</style>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        #page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 3px solid #ffffff;
+            border-radius: 0 0 50% 50% / 0 0 30px 30px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #ffffff;
+            letter-spacing: 8px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+        }
+
+        #header h1 a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        #header h1 a:hover {
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        .description {
+            color: #888;
+            font-style: italic;
+        }
+
+        #content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        #basic-accordian {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .latest-posts {
+            margin-bottom: 30px;
+            background: rgba(26, 26, 26, 0.5);
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 30px;
+        }
+
+        .latest-posts h3 {
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+        }
+
+        .latest-post-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #333;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center center;
+            position: relative;
+            text-align: center;
+        }
+
+        .latest-post-item:last-child {
+            border-bottom: none;
+        }
+
+        .latest-post-item:hover {
+            padding-left: 0;
+            border-left: none;
+            transform: scale(1.1) translateZ(20px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.4);
+            z-index: 10;
+            border: 2px solid #ffffff;
+            border-radius: 25px;
+        }
+
+        .latest-post-item .postdate {
+            color: #ffffff;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .latest-post-item a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.3s ease;
+        }
+
+        .latest-post-item a:hover {
+            color: #ffffff;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .square-button {
+            aspect-ratio: 1;
+            background-color: #1a1a1a !important; 
+            border: 2px solid #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: #ffffff; 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            padding: 20px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+        }
+
+        .btn-mission-1 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('nivs_sprinter_jacket_sex.png'); 
+        }
+        .btn-mission-2 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('zrky_i8_final_final02.png');
+        }
+        .btn-mission-3 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('radiator_springs_jacket.jpg');
+        }
+        .btn-mission-4 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('IMG_7267.jpg');
+        }
+        .btn-mission-5 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('SUMMER DEATHMATCH_SEASON!1.png');
+        }
+        .btn-mission-6 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('IMG_7268.JPG');
+        }
+        .btn-camera-roll {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            font-size: 1em;
+        }
+
+        .square-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .square-button:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+            transform: scale(1.15) translateZ(20px);
+            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+            z-index: 10;
+        }
+
+        .square-button:hover::before {
+            left: 100%;
+        }
+
+        .tab_container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .accordion_headings {
+            flex: 1;
+            padding: 15px 20px;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 30px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            color: #888;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .accordion_headings:hover {
+            background: #222;
+            border-color: #ffffff;
+        }
+
+        .accordion_headings.header_highlight {
+            background: #ffffff;
+            color: #0a0a0a;
+            border-color: #ffffff;
+        }
+
+        .accordion_child {
+            background: rgba(26, 26, 26, 0.8);
+            border: 2px solid #333;
+            padding: 30px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        #home-content, #menu-content {
+            display: none;
+        }
+
+        #home-content.active, #menu-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post {
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center center;
+            position: relative;
+            text-align: center;
+        }
+
+        .post:hover {
+            padding-left: 0;
+            border-left: none;
+            transform: scale(1.1) translateZ(20px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.4);
+            z-index: 10;
+            border: 2px solid #ffffff;
+            border-radius: 25px;
+        }
+
+        .post:last-child {
+            border-bottom: none;
+        }
+
+        .postdate {
+            color: #ffffff;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .post a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .post a:hover {
+            color: #ffffff;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
+            border-radius: 50% 50% 0 0 / 20px 20px 0 0;
+        }
+
+        .navigation a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #ffffff;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .navigation a:hover {
+            background: #ffffff;
+            color: #0a0a0a;
+        }
+
+        #archives ul {
+            list-style: none;
+        }
+
+        #archives > ul > li {
+            margin-bottom: 30px;
+        }
+
+        #archives > ul > li > ul {
+            margin-top: 15px;
+        }
+
+        #archives li {
+            margin: 8px 0;
+        }
+
+        #archives a {
+            color: #aaa;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        #archives a:hover {
+            color: #ffffff;
+            padding-left: 10px;
+        }
+
+        .categories, #archives > ul > li:first-child {
+            color: #ffffff;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+
+        .archive-category-btn {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #ffffff;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .archive-category-btn:hover {
+            background: #222;
+            border-color: #ffffff;
+            transform: scale(1.02);
+        }
+
+        .archive-category-btn.active {
+            background: #ffffff;
+            color: #0a0a0a;
+            border-color: #ffffff;
+        }
+
+        .archive-items {
+            display: none;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+        }
+
+        .archive-items.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .archive-items ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .archive-items li {
+            margin: 8px 0;
+        }
+
+        #searchform {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #searchform input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            background: #0a0a0a;
+            border: 2px solid #333;
+            border-radius: 25px;
+            color: #e0e0e0;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #searchform input[type="text"]:focus {
+            border-color: #ffffff;
+        }
+
+        #searchform input[type="submit"] {
+            padding: 10px 20px;
+            background: #ffffff;
+            color: #0a0a0a;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        #searchform input[type="submit"]:hover {
+            background: #00dd77;
+            transform: scale(1.05);
+        }
+
+        #footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+            border-top: 2px solid #333;
+            border-radius: 50% 50% 0 0 / 30px 30px 0 0;
+            color: #666;
+        }
+
+        #footer a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            #header h1 {
+                font-size: 2em;
+            }
+
+            .button-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tab_container {
+                flex-direction: column;
+            }
+
+            .navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- カーソル要素 -->
+<div id="cursor" aria-hidden="true"></div>
+
+    <div id="page">
+        <div id="header">
+            <h1><a href="#">SPACESHIP</a></h1>
+        </div>
+
+        <div id="content">
+            <div id="basic-accordian">
+                <div class="latest-posts">
+                    <h3>Archives</h3>
+                    <div id="archives">
+                        <div class="archive-category">
+                            <button class="archive-category-btn" onclick="toggleArchiveCategory('mode')">MODE</button>
+                            <div id="mode-items" class="archive-items">
+                                <ul>
+                                      <li><a href="gas.html">GAS</a></li>
+                                      <li><a href="dome.html">DOME</a></li>
+                                      <li><a href="pack.html">PACK</a></li>
+                                      <li><a href="slomo.html">SLOMO</a></li>
+                                      <li><a href="isolation.html">ISOLATION</a></li>
+                                      <li><a href="with.html">WITH</a></li>
+                                      <li><a href="departure.html">DEPARTURE</a></li>
+
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="archive-category">
+                            <button class="archive-category-btn" onclick="toggleArchiveCategory('area')">AREA</button>
+                            <div id="area-items" class="archive-items">
+                                <ul>
+                                    <li><a href="mountain.html">MOUNTAIN</a></li>
+                                    <li><a href="forest.html">FOREST</a></li>
+                                    <li><a href="riverside.html">RIVERSIDE</a></li>
+                                    <li><a href="factory.html">FACTORY</a></li>
+                                    <li><a href="desert.html">DESERT</a></li>
+                                    <li><a href="metropolis.html">METROPOLIS</a></li>
+                                    <li><a href="tunnel.html">TUNNEL</a></li>
+                                    <li><a href="aquarium.html">AQUARIUM</a></li>
+                                    <li><a href="galaxy.html">GALAXY</a></li>
+                                    <li><a href="beach.html">BEACH</a></li>
+                                    <li><a href="casino.html">CASINO</a></li>
+                                    <li><a href="shopping_mall.html">SHOPPING MALL</a></li>
+                                    <li><a href="rural.html">RURAL</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="archive-category">
+                            <button class="archive-category-btn" onclick="toggleArchiveCategory('aura')">AURA</button>
+                            <div id="aura-items" class="archive-items">
+                                <ul>
+                                    <li><a href="sunrise.html">SUNRISE</a></li>
+                                    <li><a href="sunshine.html">SUNSHINE</a></li>
+                                    <li><a href="nap.html">NAP</a></li>
+                                    <li><a href="sunset.html">SUNSET</a></li>
+                                    <li><a href="dinner.html">DINNER</a></li>
+                                    <li><a href="midnight.html">MIDNIGHT</a></li>
+                                    <li><a href="before_dawn.html">BEFORE DAWN</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <form method="get" id="searchform">
+                            <div>
+                                <input type="text" placeholder="Search archives..." name="s" id="s" />
+                                <input type="submit" id="searchsubmit" value="Search" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab_container">
+                    <div id="home-header" class="accordion_headings header_highlight" onclick="toggleTab('home')">Articles</div>
+                    <div class="accordion_headings" onclick="location.href='gallery.html'">camera roll</div>
+                    <div class="accordion_headings" onclick="location.href='letters.html'">letters</div>
+                </div>
+
+                <div id="home-content" class="active">
+                   <div class="accordion_child">
+        <div class="post">
+            <span class="postdate">06.12.25</span> 
+            <a href="https://allheroesband-create.github.io/POPS-is-DEAD-but-I-Still-L-VE-in-Pops-WEAPONS-/">
+                POPS is DEAD but I Still L♡VE in Pops!!! ―『WEAPONS』評 ―
+            </a>
+        </div>
+                        <div class="navigation">
+                            <a href="#">&laquo; Previous Entries</a>
+                            <a href="#">Next Page &raquo;</a>
+<form method="get" id="searchform">
+                                <div>
+                                    <input type="text" placeholder="Search archives..." name="s" id="s" />
+                                    <input type="submit" id="searchsubmit" value="Search" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="footer">
+            <p>SPACESHIP </p>
+        </div>
+    </div>
+
+    
+    <script>
+        
+        function toggleTab(tab) {
+            const homeHeader = document.getElementById('home-header');
+            const menuHeader = document.getElementById('menu-header');
+            const homeContent = document.getElementById('home-content');
+            const menuContent = document.getElementById('menu-content');
+
+            if (tab === 'home') {
+                homeHeader.classList.add('header_highlight');
+                menuHeader.classList.remove('header_highlight');
+                homeContent.classList.add('active');
+                menuContent.classList.remove('active');
+            } else {
+                menuHeader.classList.add('header_highlight');
+                homeHeader.classList.remove('header_highlight');
+                menuContent.classList.add('active');
+                homeContent.classList.remove('active');
+            }
+        }
+
+        function toggleArchiveCategory(category) {
+            const itemsDiv = document.getElementById(category + '-items');
+            const button = event.target;
+            
+            // Toggle the clicked category
+            if (itemsDiv.classList.contains('show')) {
+                itemsDiv.classList.remove('show');
+                button.classList.remove('active');
+            } else {
+                itemsDiv.classList.add('show');
+                button.classList.add('active');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('home-content').classList.add('active');
+        });
+    </script>
+
+    <script>
+/*
+  改善ポイント実装：
+  - 軌跡生成にレート制限（minInterval）
+  - 同時生成数上限（maxTrails）
+  - 軌跡を中央に置くため transform: translate(-50%,-50%) を利用
+  - タッチ対応（タッチ時はタッチ座標で発生）
+  - エラー回避（#cursor が null の場合は no-op）
+*/
+
+(function(){
+  const cursor = document.getElementById('cursor');
+  if(!cursor) return;
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let cursorX = mouseX, cursorY = mouseY;
+
+  // レート制限 & 最大生成数
+  const minInterval = 40; // ms（これ以下の間隔では生成しない）
+  let lastTrailTime = 0;
+  const maxTrails = 60;
+  let activeTrails = 0;
+
+  // マウス移動
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX; mouseY = e.clientY;
+
+    const now = performance.now();
+    if(now - lastTrailTime >= minInterval && activeTrails < maxTrails){
+      spawnTrail(mouseX, mouseY);
+      lastTrailTime = now;
+    }
+  }, { passive: true });
+
+  // タッチ対応（タッチ開始 or move）
+  function onTouch(e){
+    if(!e) return;
+    const t = e.touches && e.touches[0];
+    if(!t) return;
+    mouseX = t.clientX; mouseY = t.clientY;
+    const now = performance.now();
+    if(now - lastTrailTime >= minInterval && activeTrails < maxTrails){
+      spawnTrail(mouseX, mouseY);
+      lastTrailTime = now;
+    }
+  }
+  document.addEventListener('touchstart', onTouch, { passive: true });
+  document.addEventListener('touchmove', onTouch, { passive: true });
+
+  // カーソル滑らか追従
+  function updateLoop(){
+    cursorX += (mouseX - cursorX) * 0.22;
+    cursorY += (mouseY - cursorY) * 0.22;
+    cursor.style.left = cursorX + 'px';
+    cursor.style.top = cursorY + 'px';
+    requestAnimationFrame(updateLoop);
+  }
+  requestAnimationFrame(updateLoop);
+
+  // 軌跡生成
+  function spawnTrail(x, y){
+    const el = document.createElement('div');
+    el.className = 'cursor-trail';
+    // 中心配置するため left/top + transform used in CSS
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+
+    // 軌跡サイズと透明度に少しランダム幅を持たせる（視覚バリエーション）
+    const s = 4 + Math.random() * 6; // 4-10px
+    el.style.width = s + 'px';
+    el.style.height = s + 'px';
+    el.style.opacity = (0.7 + Math.random()*0.3).toString();
+
+    // append
+    document.body.appendChild(el);
+    activeTrails++;
+
+    // cleanup：アニメーション長と合わせて削除（少し余裕）
+    const life = 1000; // ms
+    setTimeout(()=>{
+      if(el && el.parentNode) el.parentNode.removeChild(el);
+      activeTrails = Math.max(0, activeTrails - 1);
+    }, life + 50);
+  }
+
+  // デバッグ用：エラー確認
+  window.__cursorTrailStatus = () => ({ mouseX, mouseY, cursorX, cursorY, activeTrails });
+
+})();
+
+</script>
+    
+</body>
+
+</html>
