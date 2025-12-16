@@ -348,6 +348,7 @@ a, button, input, textarea, [onclick],
             font-size: 0.85em;
             display: block;
             margin-bottom: 5px;
+            pointer-events: none;
         }
 
         .latest-post-item a {
@@ -355,6 +356,9 @@ a, button, input, textarea, [onclick],
             text-decoration: none;
             font-size: 0.95em;
             transition: color 0.3s ease;
+            display: block;
+            padding: 12px;
+            margin: -12px;
         }
 
         .latest-post-item a:hover {
@@ -503,14 +507,18 @@ a, button, input, textarea, [onclick],
             color: #ffffff;
             font-weight: bold;
             font-family: 'Courier New', monospace;
-            display: inline-block;
+            display: block;
             min-width: 80px;
+            pointer-events: none;
         }
 
         .post a {
             color: #e0e0e0;
             text-decoration: none;
             transition: color 0.3s ease;
+            display: block;
+            padding: 20px;
+            margin: -20px;
         }
 
         .post a:hover {
@@ -743,8 +751,8 @@ a, button, input, textarea, [onclick],
             
                 <div class="tab_container">
                     <div id="home-header" class="accordion_headings header_highlight" onclick="toggleTab('home')">Articles</div>
-                    <div class="accordion_headings" onclick="alert('Camera Roll')">camera roll</div>
-                    <div class="accordion_headings" onclick="alert('Letters')">letters</div>
+                    <div class="accordion_headings" onclick="location.href='gallery.html'">camera roll</div>
+                    <div class="accordion_headings" onclick="location.href='letters.html'">letters</div>
                 </div>
 
                 <div id="home-content" class="active">
@@ -824,3 +832,137 @@ a, button, input, textarea, [onclick],
                         </div>
 
                         <form method="get" id="searchform">
+                            <div>
+                                <input type="text" placeholder="Search archives..." name="s" id="s" />
+                                <input type="submit" id="searchsubmit" value="Search" />
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="footer">
+            <p>SPACESHIP</p>
+        </div>
+    </div>
+
+    
+    <script>
+        
+        function toggleTab(tab) {
+            const homeHeader = document.getElementById('home-header');
+            const menuHeader = document.getElementById('menu-header');
+            const homeContent = document.getElementById('home-content');
+            const menuContent = document.getElementById('menu-content');
+
+            if (tab === 'home') {
+                homeHeader.classList.add('header_highlight');
+                if(menuHeader) menuHeader.classList.remove('header_highlight');
+                homeContent.classList.add('active');
+                if(menuContent) menuContent.classList.remove('active');
+            } else {
+                if(menuHeader) menuHeader.classList.add('header_highlight');
+                homeHeader.classList.remove('header_highlight');
+                if(menuContent) menuContent.classList.add('active');
+                homeContent.classList.remove('active');
+            }
+        }
+
+        function toggleArchiveCategory(category) {
+            const itemsDiv = document.getElementById(category + '-items');
+            const button = event.target;
+            
+            // Toggle the clicked category
+            if (itemsDiv.classList.contains('show')) {
+                itemsDiv.classList.remove('show');
+                button.classList.remove('active');
+            } else {
+                itemsDiv.classList.add('show');
+                button.classList.add('active');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('home-content').classList.add('active');
+        });
+    </script>
+
+    <script>
+(function(){
+  const cursor = document.getElementById('cursor');
+  if(!cursor) return;
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let cursorX = mouseX, cursorY = mouseY;
+
+  const minInterval = 40;
+  let lastTrailTime = 0;
+  const maxTrails = 60;
+  let activeTrails = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX; mouseY = e.clientY;
+
+    const now = performance.now();
+    if(now - lastTrailTime >= minInterval && activeTrails < maxTrails){
+      spawnTrail(mouseX, mouseY);
+      lastTrailTime = now;
+    }
+  }, { passive: true });
+
+  function onTouch(e){
+    if(!e) return;
+    const t = e.touches && e.touches[0];
+    if(!t) return;
+    mouseX = t.clientX; mouseY = t.clientY;
+    const now = performance.now();
+    if(now - lastTrailTime >= minInterval && activeTrails < maxTrails){
+      spawnTrail(mouseX, mouseY);
+      lastTrailTime = now;
+    }
+  }
+  document.addEventListener('touchstart', onTouch, { passive: true });
+  document.addEventListener('touchmove', onTouch, { passive: true });
+
+  function updateLoop(){
+    cursorX += (mouseX - cursorX) * 0.22;
+    cursorY += (mouseY - cursorY) * 0.22;
+    cursor.style.left = cursorX + 'px';
+    cursor.style.top = cursorY + 'px';
+    requestAnimationFrame(updateLoop);
+  }
+  requestAnimationFrame(updateLoop);
+
+  function spawnTrail(x, y){
+    const el = document.createElement('div');
+    el.className = 'cursor-trail';
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+
+    const s = 4 + Math.random() * 6;
+    el.style.width = s + 'px';
+    el.style.height = s + 'px';
+    el.style.opacity = (0.7 + Math.random()*0.3).toString();
+
+    document.body.appendChild(el);
+    activeTrails++;
+
+    const life = 1000;
+    setTimeout(()=>{
+      if(el && el.parentNode) el.parentNode.removeChild(el);
+      activeTrails = Math.max(0, activeTrails - 1);
+    }, life + 50);
+  }
+
+  window.__cursorTrailStatus = () => ({ mouseX, mouseY, cursorX, cursorY, activeTrails });
+
+})();
+
+</script>
+    
+</body>
+
+</html>
