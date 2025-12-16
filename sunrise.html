@@ -9,6 +9,12 @@
 /* --- カーソル：ベース --- */
 body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 
+/* テキスト選択可能な要素では通常カーソルを表示 */
+a, button, input, textarea, [onclick], 
+.post, .latest-post-item, .accordion_headings, .square-button, .navigation a,
+#archives a, .archive-category-btn {
+  cursor: auto !important;
+}
 /* カーソル本体 */
 #cursor {
   position: fixed;
