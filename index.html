@@ -53,9 +53,39 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
 }
 
+/* GIFオーバーレイ（初回再生用） */
+#gif-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2147483648; /* カーソルより上 */
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+#gif-overlay.fade-out {
+  opacity: 0;
+}
+
+#gif-overlay.hidden {
+  display: none;
+}
+
+#gif-intro {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* デバッグ枠（必要なら有効に） */
 /* #cursor { outline: 1px solid rgba(255,255,255,0.08); } */
-</style>
 </style>
 
     <style>
@@ -67,7 +97,11 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 
         body {
             font-family: 'Georgia', serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            background: linear-gradient(135deg, rgba(10,10,10,0) 0%, rgba(26,26,26,0) 100%), url('Starsbackground.gif');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
             color: #e0e0e0;
             line-height: 1.6;
         }
@@ -551,6 +585,11 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
     <!-- カーソル要素 -->
 <div id="cursor" aria-hidden="true"></div>
 
+    <!-- 初回再生用のGIFオーバーレイ -->
+    <div id="gif-overlay">
+        <img src="galaxy.gif" alt="" id="gif-intro">
+    </div>
+
     <div id="page">
         <div id="header">
             <h1><a href="#">SPACESHIP</a></h1>
@@ -854,6 +893,38 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 
 })();
 
+</script>
+
+    <script>
+// GIF初回再生処理
+(function(){
+  const overlay = document.getElementById('gif-overlay');
+  const gifImg = document.getElementById('gif-intro');
+  
+  if(!overlay || !gifImg) return;
+
+  // GIFの再生時間を設定（ミリ秒）
+  // 例: 3秒のGIFなら 3000
+  const gifDuration = 3000; // ←ここをGIFの長さに合わせて調整
+
+  // GIF再生完了後にフェードアウト
+  setTimeout(() => {
+    overlay.classList.add('fade-out');
+    
+    // フェードアウト完了後に完全に削除
+    setTimeout(() => {
+      overlay.classList.add('hidden');
+    }, 500); // transition時間と合わせる
+  }, gifDuration);
+
+  // クリックでスキップ可能にする（オプション）
+  overlay.addEventListener('click', () => {
+    overlay.classList.add('fade-out');
+    setTimeout(() => {
+      overlay.classList.add('hidden');
+    }, 500);
+  });
+})();
 </script>
     
 </body>
