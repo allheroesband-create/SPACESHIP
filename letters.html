@@ -350,10 +350,15 @@
 <!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // ===== Supabase 初期化 =====
-  const SUPABASE_URL = "https://tovffzyfssluxmbzhctb.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvdmZmenlmc3NsdXhtYnpoY3RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTE0MDAsImV4cCI6MjA4MDQyNzQwMH0.7SOXnMuCvo_d5L3YvpFdBIkmXzMg7QLGT3Tvmi-Ky8Q";
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // ===== Supabase 初期化（再宣言防止）=====
+const SUPABASE_URL = "https://tovffzyfssluxmbzhctb.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvdmZmenlmc3NsdXhtYnpoY3RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTE0MDAsImV4cCI6MjA4MDQyNzQwMH0.7SOXnMuCvo_d5L3YvpFdBIkmXzMg7QLGT3Tvmi-Ky8Q";
+
+if (!window._supabaseClient) {
+  window._supabaseClient =
+    window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+const supabase = window._supabaseClient;
 
   let letters = [];
   let selectedId = null;
@@ -744,3 +749,4 @@
 </script>
 </body>
 </html>
+
