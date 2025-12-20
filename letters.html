@@ -354,11 +354,13 @@
 const SUPABASE_URL = "https://tovffzyfssluxmbzhctb.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvdmZmenlmc3NsdXhtYnpoY3RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NTE0MDAsImV4cCI6MjA4MDQyNzQwMH0.7SOXnMuCvo_d5L3YvpFdBIkmXzMg7QLGT3Tvmi-Ky8Q";
 
-if (!window._supabaseClient) {
-  window._supabaseClient =
-    window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-}
-const supabase = window._supabaseClient;
+window.supabaseClient ||= window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+// 以降のコードで使う参照（const を避けたいなら window を直接使う）
+const sb = window.supabaseClient;
 
   let letters = [];
   let selectedId = null;
@@ -372,13 +374,13 @@ const supabase = window._supabaseClient;
 
   // ===== 手紙ロード =====
   async function loadLetters() {
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from("letters")
       .select("*")
       .order("created_at", { ascending: true });
 
     if (error) {
-      console.error("Supabase load error:", error);
+      console.error("sb load error:", error);
       letters = [];
       return;
     }
@@ -705,7 +707,7 @@ const supabase = window._supabaseClient;
       return;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from("letters")
       .insert({
         from_name: from,
@@ -718,7 +720,7 @@ const supabase = window._supabaseClient;
       .single();
 
     if(error){
-      console.error("Supabase insert error:", error);
+      console.error("sb insert error:", error);
       alert("送信に失敗しました。");
       return;
     }
@@ -749,4 +751,5 @@ const supabase = window._supabaseClient;
 </script>
 </body>
 </html>
+
 
