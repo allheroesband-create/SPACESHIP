@@ -15,11 +15,30 @@
     height: 100%;
     background: #000;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     z-index: 9999;
     transition: opacity 0.5s ease;
     cursor: pointer;
+}
+
+#tap-to-start {
+    position: absolute;
+    bottom: 50px;
+    color: #fff;
+    font-size: 1.2em;
+    text-align: center;
+    animation: pulse 2s ease-in-out infinite;
+    pointer-events: none;
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.05); }
 }
 
 #loading-screen.hidden {
@@ -42,7 +61,7 @@
     height: 100%;
     object-fit: cover;
     z-index: -1;
-    opacity: １;
+    opacity: 0.3;
 }
 
 /* --- カーソル：ベース --- */
@@ -582,9 +601,10 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; overflow-x: hi
 <body>
     <!-- ローディング画面（イントロ動画） -->
     <div id="loading-screen">
-        <video id="intro-video" autoplay muted playsinline>
+        <video id="intro-video" autoplay muted playsinline webkit-playsinline>
             <source src="zebraski_point.mp4" type="video/mp4">
         </video>
+        <div id="tap-to-start" style="display: none;">TAP TO START</div>
     </div>
 
     <!-- 背景動画（ループ再生） -->
@@ -705,18 +725,48 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; overflow-x: hi
         const loadingScreen = document.getElementById('loading-screen');
         const introVideo = document.getElementById('intro-video');
         const backgroundVideo = document.getElementById('background-video');
+        const tapToStart = document.getElementById('tap-to-start');
+        let videoStarted = false;
 
         // ローディング画面を終了する関数
         function endIntro() {
             loadingScreen.classList.add('hidden');
-            backgroundVideo.play();
+            backgroundVideo.play().catch(err => console.log('背景動画再生エラー:', err));
         }
 
         // イントロ動画が終了したら自動的にメインページへ
         introVideo.addEventListener('ended', endIntro);
 
-        // クリックでイントロ動画をスキップ
-        loadingScreen.addEventListener('click', endIntro);
+        // クリック/タップでイントロ動画をスキップ
+        loadingScreen.addEventListener('click', function() {
+            if (!videoStarted) {
+                // まだ動画が開始していない場合は開始を試みる
+                introVideo.play().then(() => {
+                    videoStarted = true;
+                    tapToStart.style.display = 'none';
+                }).catch(err => {
+                    console.log('動画再生エラー:', err);
+                    endIntro();
+                });
+            } else {
+                // 動画再生中ならスキップ
+                endIntro();
+            }
+        });
+
+        // 動画の再生が開始されたら状態を更新
+        introVideo.addEventListener('play', function() {
+            videoStarted = true;
+            tapToStart.style.display = 'none';
+        });
+
+        // 自動再生の確認（少し遅延させて確実に試行）
+        setTimeout(() => {
+            if (!videoStarted) {
+                // 自動再生が始まっていない場合はタップを促す
+                tapToStart.style.display = 'block';
+            }
+        }, 500);
 
         // 動画の読み込みに失敗した場合の処理
         introVideo.addEventListener('error', function() {
