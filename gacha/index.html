@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>USA the Freedom Colosseum</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="wrap">
+
+      <!-- イントロ（開始画面） -->
+      <section id="intro" class="intro">
+        <div class="introText">
+          <h1>USA the Freedom Colosseum</h1>
+          <p class="sub">Card Game of America</p>
+        </div>
+
+        <button id="gunBtn" class="gun idle" aria-label="shoot">
+          <video
+            id="gunVideo"
+            class="gunVideo"
+            src="./assets/gun.mp4"
+            preload="auto"
+            playsinline
+          ></video>
+        </button>
+      </section>
+
+      <!-- カード表示エリア -->
+      <section class="stage">
+        <div id="cardReveal" class="cardReveal" aria-live="polite"></div>
+
+        <!-- カードが出た後に出すボタン -->
+        <div id="afterControls" class="afterControls" hidden>
+          <button id="againBtn" class="btn">もう一度引く</button>
+          <button id="collectionBtn" class="btn ghost">コレクションを見る</button>
+        </div>
+
+        <!-- デバッグ用（残したいならそのまま） -->
+        
+
+        <div id="history" class="history"></div>
+      </section>
+
+      <footer class="foot">
+        <small>Holo-ish effect: CSS variables + glare/shine layers.</small>
+      </footer>
+    </main>
+
+    <!-- コレクション（モーダル） -->
+    <div id="collectionModal" class="modal" hidden>
+      <div class="modal__backdrop" data-close="1"></div>
+
+      <div class="modal__panel" role="dialog" aria-modal="true" aria-label="カードコレクション">
+        <div class="modal__head">
+          <h2 class="modal__title">CARD COLLECTION</h2>
+          <button id="closeCollectionBtn" class="btn small">閉じる</button>
+        </div>
+
+        <div id="collectionGrid" class="collectionGrid"></div>
+
+        <div class="modal__foot">
+          <button id="resetCollectionBtn" class="btn danger small">コレクションをリセット</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
+
