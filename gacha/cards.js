@@ -53,7 +53,7 @@ export const CARDS = [
     id: "peter_thiel",
     name: "PETER THIEL",
     rarity: "Lieutenant Colonel",
-    image: "./assets/Peter_Thiel2.png",
+    image: "./assets/Peter_Thiel3.png",
     overlayImage: "./assets/Peter_Thiel_overlay.png"
   },
   {
@@ -71,6 +71,7 @@ export const CARDS = [
     overlayImage: "./assets/EDWARD_SNOWDEN_overlay.png"
   },
 ];
+
 
 
 
