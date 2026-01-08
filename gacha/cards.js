@@ -18,14 +18,14 @@ export const CARDS = [
     id: "right_hand",
     name: "RIGHT HAND",
     rarity: "Colonel",
-    image: "./assets/RIGHT_HAND.png"
+    image: "./assets/RIGHT_HAND.png",
     overlayImage: "./assets/RIGHT_HAND_overlay.png"
   },
   {
     id: "erica_kirk",
     name: "ERICA KIRK",
     rarity: "Lieutenant Colonel",
-    image: "./assets/Erica_kirk.png"
+    image: "./assets/Erica_kirk.png",
     overlayImage: "./assets/Erica_kirk_overlay.png"
   },
   {
@@ -39,7 +39,7 @@ export const CARDS = [
     name: "THE POWER OF FRIENDSHIP",
     rarity: "Colonel",
     image: "./assets/The_Power_of_Friendship.png",
-    overlayImage: "./assets/The_Power_of_Friendship_2.png"  // エフェクトの上に表示される画像
+    overlayImage: "./assets/The_Power_of_Friendship_2.png"
   },
   {
     id: "epstein",
@@ -54,8 +54,3 @@ export const CARDS = [
     image: "./assets/Peter_Thiel2.png"
   }
 ];
-
-
-
-
-
