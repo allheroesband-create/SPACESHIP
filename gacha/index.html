@@ -21,7 +21,8 @@
           <p class="sub">Card Game of America</p>
         </div>
 
-        <button id="gunBtn" class="gun idle" aria-label="shoot">
+        <!-- 銃動画（最初は非表示） -->
+        <div id="gunContainer" class="gunContainer" hidden>
           <video
             id="gunVideo"
             class="gunVideo"
@@ -29,9 +30,9 @@
             preload="auto"
             playsinline
           ></video>
-        </button>
+        </div>
 
-        <!-- ガチャを引くボタン追加 -->
+        <!-- ガチャを引くボタン -->
         <button id="gachaBtn" class="gachaBtn">
           <span class="gachaBtn__icon">🎰</span>
           <span class="gachaBtn__text">ガチャを引く</span>
