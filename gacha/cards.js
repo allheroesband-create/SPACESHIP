@@ -51,9 +51,10 @@ export const CARDS = [
   {
     id: "peter_thiel",
     name: "PETER THIEL",
-    rarity: "Colonel",
+    rarity: "Lieutenant Colonel",
     image: "./assets/Peter_Thiel2.png",
     overlayImage: "./assets/Peter_Thiel_overlay.png"
   }
 ];
+
 
