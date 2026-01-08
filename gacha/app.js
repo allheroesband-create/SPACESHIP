@@ -9,8 +9,8 @@ const $ = (sel) => document.querySelector(sel);
 let touchStartY = 0;
 let touchStartX = 0;
 let touchStartTime = 0;
-const SWIPE_THRESHOLD = 80; // スワイプと判定する最小距離(px)
-const SWIPE_TIME_LIMIT = 500; // スワイプの最大時間(ms)
+const SWIPE_THRESHOLD = 80;
+const SWIPE_TIME_LIMIT = 500;
 
 const introEl = $("#intro");
 const gunContainer = $("#gunContainer");
@@ -31,8 +31,31 @@ const resetCollectionBtn = $("#resetCollectionBtn");
 const collectionGrid = $("#collectionGrid");
 
 let locked = false;
-let videoReady = false;
-let videoLoadAttempted = false;
+
+/* -----------------------------
+   デバッグ用: 要素の存在確認
+----------------------------- */
+console.log("=== ELEMENT CHECK ===");
+console.log("introEl:", introEl ? "✅" : "❌");
+console.log("gunContainer:", gunContainer ? "✅" : "❌");
+console.log("gunVideo:", gunVideo ? "✅" : "❌");
+console.log("gachaBtn:", gachaBtn ? "✅" : "❌");
+console.log("cardRevealEl:", cardRevealEl ? "✅" : "❌");
+
+if (gunVideo) {
+  console.log("Video element details:");
+  console.log("- src:", gunVideo.src);
+  console.log("- readyState:", gunVideo.readyState);
+  console.log("- networkState:", gunVideo.networkState);
+}
+
+if (gunContainer) {
+  console.log("gunContainer computed style:");
+  const style = window.getComputedStyle(gunContainer);
+  console.log("- display:", style.display);
+  console.log("- position:", style.position);
+  console.log("- z-index:", style.zIndex);
+}
 
 /* -----------------------------
    ユーティリティ
@@ -51,7 +74,6 @@ function escapeHtml(s) {
 
 /* -----------------------------
    1) 均等抽選(全カード同確率)
-   重複あり・確率は毎回同じ
 ----------------------------- */
 function pickUniform(cards) {
   const i = Math.floor(Math.random() * cards.length);
@@ -59,34 +81,73 @@ function pickUniform(cards) {
 }
 
 /* -----------------------------
-   2) 銃:初期化(プリロード)
+   2) 銃:初期化
 ----------------------------- */
 function initGunVideo() {
-  if (!gunVideo) return;
+  if (!gunVideo) {
+    console.error("❌ gunVideo element not found!");
+    return;
+  }
   
   console.log("🎬 Initializing gun video...");
   
-  // 動画の準備完了を監視
-  gunVideo.addEventListener("canplaythrough", () => {
-    console.log("✅ Gun video is ready to play");
-    videoReady = true;
-  }, { once: true });
-  
-  // エラーハンドリング
-  gunVideo.addEventListener("error", (e) => {
-    console.error("❌ Gun video error:", e);
-    console.log("Video src:", gunVideo.src);
-    console.log("Video readyState:", gunVideo.readyState);
+  // 動画イベントリスナー
+  gunVideo.addEventListener("loadstart", () => {
+    console.log("📥 Video: loadstart");
   });
   
-  // 動画読み込み状態のログ
-  gunVideo.addEventListener("loadstart", () => console.log("📥 Video loading started"));
-  gunVideo.addEventListener("loadedmetadata", () => console.log("📊 Video metadata loaded"));
-  gunVideo.addEventListener("loadeddata", () => console.log("📦 Video data loaded"));
+  gunVideo.addEventListener("loadedmetadata", () => {
+    console.log("📊 Video: loadedmetadata");
+    console.log("  Duration:", gunVideo.duration);
+    console.log("  Video dimensions:", gunVideo.videoWidth, "x", gunVideo.videoHeight);
+  });
   
-  // 強制的にロード開始
+  gunVideo.addEventListener("loadeddata", () => {
+    console.log("📦 Video: loadeddata");
+  });
+  
+  gunVideo.addEventListener("canplay", () => {
+    console.log("▶️ Video: canplay");
+  });
+  
+  gunVideo.addEventListener("canplaythrough", () => {
+    console.log("✅ Video: canplaythrough (ready to play)");
+  });
+  
+  gunVideo.addEventListener("error", (e) => {
+    console.error("❌ Video error event:", e);
+    if (gunVideo.error) {
+      console.error("Error code:", gunVideo.error.code);
+      console.error("Error message:", gunVideo.error.message);
+      const errorMessages = {
+        1: "MEDIA_ERR_ABORTED - The fetching process for the media resource was aborted",
+        2: "MEDIA_ERR_NETWORK - A network error occurred while fetching the media resource",
+        3: "MEDIA_ERR_DECODE - An error occurred while decoding the media resource",
+        4: "MEDIA_ERR_SRC_NOT_SUPPORTED - The media resource is not supported"
+      };
+      console.error("Explanation:", errorMessages[gunVideo.error.code]);
+    }
+  });
+  
+  gunVideo.addEventListener("play", () => {
+    console.log("▶️ Video: play event fired");
+  });
+  
+  gunVideo.addEventListener("playing", () => {
+    console.log("▶️ Video: playing (actually playing now)");
+  });
+  
+  gunVideo.addEventListener("pause", () => {
+    console.log("⏸️ Video: pause");
+  });
+  
+  gunVideo.addEventListener("ended", () => {
+    console.log("🏁 Video: ended");
+  });
+  
+  // 強制ロード
   gunVideo.load();
-  videoLoadAttempted = true;
+  console.log("📥 Video load() called");
 }
 
 // ページ読み込み後に初期化
@@ -97,16 +158,19 @@ if (document.readyState === 'loading') {
 }
 
 /* -----------------------------
-   3) ガチャを引くボタン:銃動画再生→カード表示
+   3) ガチャボタンクリック
 ----------------------------- */
 gachaBtn?.addEventListener("click", async () => {
-  if (locked) return;
-  console.log("🎰 Gacha button clicked!");
+  console.log("🎰 === GACHA BUTTON CLICKED ===");
+  if (locked) {
+    console.log("⚠️ Gacha is locked, ignoring click");
+    return;
+  }
   triggerGacha();
 });
 
 /* -----------------------------
-   3.6) スワイプでガチャを引く(スマホ用)
+   3.6) スワイプでガチャ
 ----------------------------- */
 function handleTouchStart(e) {
   touchStartY = e.touches[0].clientY;
@@ -125,7 +189,6 @@ function handleTouchEnd(e) {
   const deltaX = Math.abs(touchStartX - touchEndX);
   const deltaTime = touchEndTime - touchStartTime;
   
-  // 上スワイプ判定: 上方向に十分な距離、横移動は少なく、時間内
   if (deltaY > SWIPE_THRESHOLD && deltaX < SWIPE_THRESHOLD && deltaTime < SWIPE_TIME_LIMIT) {
     e.preventDefault();
     console.log("👆 Swipe up detected!");
@@ -134,7 +197,6 @@ function handleTouchEnd(e) {
   }
 }
 
-// スワイプフィードバック表示
 function showSwipeFeedback() {
   const feedback = document.createElement("div");
   feedback.className = "swipeFeedback";
@@ -147,7 +209,6 @@ function showSwipeFeedback() {
   }, 400);
 }
 
-// イントロ画面でのみスワイプ検出
 introEl?.addEventListener("touchstart", handleTouchStart, { passive: true });
 introEl?.addEventListener("touchend", handleTouchEnd, { passive: false });
 
@@ -157,78 +218,100 @@ introEl?.addEventListener("touchend", handleTouchEnd, { passive: false });
 async function triggerGacha() {
   if (locked) return;
   locked = true;
-  console.log("🔒 Gacha locked, starting sequence...");
-
-  // 前回のカードは消して、ボタンも隠す
+  
+  console.log("🔒 === GACHA SEQUENCE START ===");
+  console.log("Step 1: Clear previous card");
   cardRevealEl.innerHTML = "";
   afterControlsEl.hidden = true;
 
-  // ガチャボタンとスワイプヒントを隠す
+  console.log("Step 2: Hide gacha button and swipe hint");
   if (gachaBtn) gachaBtn.style.display = "none";
   if (swipeHint) swipeHint.style.display = "none";
 
-  // 動画の準備状況をチェック
-  console.log("📹 Video ready:", videoReady, "| Load attempted:", videoLoadAttempted);
+  console.log("Step 3: Show gun container");
+  console.log("Before removing isHidden:");
+  console.log("- gunContainer.className:", gunContainer.className);
+  console.log("- computed display:", window.getComputedStyle(gunContainer).display);
   
-  // まだ動画をロードしていない場合は今すぐロード
-  if (!videoLoadAttempted && gunVideo) {
-    console.log("⚠️ Video not loaded yet, loading now...");
-    gunVideo.load();
-    videoLoadAttempted = true;
-    await wait(300); // ロード時間を待つ
-  }
-
-  // 銃動画を表示
   gunContainer.classList.remove("isHidden");
-  console.log("👁️ Gun container visible");
   
-  // 動画を最初から再生
+  console.log("After removing isHidden:");
+  console.log("- gunContainer.className:", gunContainer.className);
+  console.log("- computed display:", window.getComputedStyle(gunContainer).display);
+  console.log("- computed position:", window.getComputedStyle(gunContainer).position);
+  console.log("- computed z-index:", window.getComputedStyle(gunContainer).zIndex);
+
+  // 強制的にレイアウト再計算
+  gunContainer.offsetHeight;
+
+  console.log("Step 4: Prepare video for playback");
   gunVideo.currentTime = 0;
-  gunVideo.muted = true; // ミュート必須(自動再生ポリシー対策)
+  gunVideo.muted = true;
   
-  console.log("▶️ Attempting to play video...");
-  console.log("Video src:", gunVideo.src);
-  console.log("Video readyState:", gunVideo.readyState);
+  console.log("Video state before play:");
+  console.log("- readyState:", gunVideo.readyState, "(4 = HAVE_ENOUGH_DATA)");
+  console.log("- networkState:", gunVideo.networkState);
+  console.log("- paused:", gunVideo.paused);
+  console.log("- currentTime:", gunVideo.currentTime);
+  console.log("- duration:", gunVideo.duration);
+
+  console.log("Step 5: Attempt to play video");
   
-  // 動画再生を試行
   try {
+    console.log("▶️ Calling video.play()...");
     const playPromise = gunVideo.play();
-    console.log("✅ Play initiated");
+    
+    console.log("Play promise created:", playPromise);
     
     await playPromise;
-    console.log("✅ Video playing successfully");
-  } catch (e) {
-    console.warn("⚠️ First play attempt failed:", e);
     
-    // リトライ: 少し待ってから再度試行
-    await wait(200);
+    console.log("✅ Video.play() succeeded!");
+    console.log("Video is now playing:", !gunVideo.paused);
+    
+  } catch (e) {
+    console.error("❌ First play attempt failed:", e);
+    console.error("Error name:", e.name);
+    console.error("Error message:", e.message);
+    
+    console.log("🔄 Waiting 300ms before retry...");
+    await wait(300);
+    
     try {
-      console.log("🔄 Retrying play...");
+      console.log("▶️ Retrying play...");
       await gunVideo.play();
-      console.log("✅ Video playing after retry");
+      console.log("✅ Video playing after retry!");
     } catch (e2) {
-      console.error("❌ Play blocked even after retry:", e2);
-      // それでも失敗したら動画をスキップしてカード表示へ
-      console.log("⏭️ Skipping video, going straight to card");
-      await wait(300); // 少しだけ待つ
+      console.error("❌ Second play attempt also failed:", e2);
+      console.error("Error name:", e2.name);
+      console.error("Error message:", e2.message);
+      console.log("⏭️ Skipping video, showing card directly");
+      
+      // 動画をスキップしてカード表示
+      await wait(500);
       onGunVideoEnded();
     }
   }
 }
 
 /* -----------------------------
-   4) 動画終了:フェード→カード
+   4) 動画終了→カード表示
 ----------------------------- */
 async function onGunVideoEnded() {
-  console.log("🎬 Video ended, transitioning to card...");
+  console.log("🎬 === VIDEO ENDED / TRANSITIONING TO CARD ===");
+  
+  console.log("Step 1: Fade out intro");
   introEl.classList.add("fadeout");
 
   await wait(120);
+  
+  console.log("Step 2: Reveal card with flip");
   revealPullWithFlip();
 
-  // イントロを隠す
   setTimeout(() => {
+    console.log("Step 3: Hide intro completely");
     introEl.style.display = "none";
+    
+    console.log("Step 4: Unlock gacha");
     locked = false;
     console.log("🔓 Gacha unlocked");
   }, 560);
@@ -237,25 +320,22 @@ async function onGunVideoEnded() {
 gunVideo?.addEventListener("ended", onGunVideoEnded);
 
 /* -----------------------------
-   5) もう一度引く:開始画面へ戻す
+   5) もう一度引く
 ----------------------------- */
 function resetToIntro() {
-  console.log("🔄 Resetting to intro...");
+  console.log("🔄 === RESET TO INTRO ===");
   
-  // カードを消して、ボタンも消す
   cardRevealEl.innerHTML = "";
   afterControlsEl.hidden = true;
 
-  // イントロ復帰
   introEl.style.display = "grid";
   introEl.classList.remove("fadeout");
 
-  // 銃動画を隠して巻き戻し
+  console.log("Hiding gun container");
   gunContainer.classList.add("isHidden");
   gunVideo.pause();
   gunVideo.currentTime = 0;
 
-  // ガチャボタンとスワイプヒントを復活
   if (gachaBtn) gachaBtn.style.display = "";
   if (swipeHint) swipeHint.style.display = "";
 
@@ -266,7 +346,7 @@ function resetToIntro() {
 againBtn?.addEventListener("click", resetToIntro);
 
 /* -----------------------------
-   6) コレクション保存(当てたものだけ表示)
+   6) コレクション保存
 ----------------------------- */
 function loadCollection() {
   try {
@@ -287,7 +367,6 @@ function addToCollection(card) {
 function renderCollection() {
   const map = loadCollection();
 
-  // 当てたものだけ表示(未入手は出さない)
   const owned = CARDS
     .map((c) => ({ card: c, count: map[c.id] || 0 }))
     .filter((x) => x.count > 0)
@@ -341,7 +420,7 @@ resetCollectionBtn?.addEventListener("click", () => {
 });
 
 /* -----------------------------
-   7) 裏→表フリップ表示(毎回同確率)
+   7) 裏→表フリップ表示
 ----------------------------- */
 function revealPullWithFlip() {
   const card = pickUniform(CARDS);
@@ -385,7 +464,7 @@ function addHistory(card) {
 }
 
 /* -----------------------------
-   ホロカード(poke-holo風)
+   ホロカード
 ----------------------------- */
 function renderCard(card) {
   const wrap = document.createElement("div");
@@ -444,6 +523,6 @@ function attachHoloPointer(cardRoot) {
   });
 }
 
-// 初期化完了ログ
-console.log("✅ App initialized successfully");
+console.log("✅ === APP INITIALIZED ===");
 console.log("📦 Total cards available:", CARDS.length);
+console.log("🎬 Ready to gacha!");
