@@ -31,6 +31,8 @@ const resetCollectionBtn = $("#resetCollectionBtn");
 const collectionGrid = $("#collectionGrid");
 
 let locked = false;
+let videoReady = false;
+let videoLoadAttempted = false;
 
 /* -----------------------------
    ユーティリティ
@@ -48,7 +50,7 @@ function escapeHtml(s) {
 }
 
 /* -----------------------------
-   1) 均等抽選（全カード同確率）
+   1) 均等抽選(全カード同確率)
    重複あり・確率は毎回同じ
 ----------------------------- */
 function pickUniform(cards) {
@@ -57,33 +59,54 @@ function pickUniform(cards) {
 }
 
 /* -----------------------------
-   2) 銃：初期化（プリロード）
+   2) 銃:初期化(プリロード)
 ----------------------------- */
-let videoReady = false;
-
 function initGunVideo() {
   if (!gunVideo) return;
   
+  console.log("🎬 Initializing gun video...");
+  
   // 動画の準備完了を監視
   gunVideo.addEventListener("canplaythrough", () => {
+    console.log("✅ Gun video is ready to play");
     videoReady = true;
   }, { once: true });
   
+  // エラーハンドリング
+  gunVideo.addEventListener("error", (e) => {
+    console.error("❌ Gun video error:", e);
+    console.log("Video src:", gunVideo.src);
+    console.log("Video readyState:", gunVideo.readyState);
+  });
+  
+  // 動画読み込み状態のログ
+  gunVideo.addEventListener("loadstart", () => console.log("📥 Video loading started"));
+  gunVideo.addEventListener("loadedmetadata", () => console.log("📊 Video metadata loaded"));
+  gunVideo.addEventListener("loadeddata", () => console.log("📦 Video data loaded"));
+  
   // 強制的にロード開始
   gunVideo.load();
+  videoLoadAttempted = true;
 }
-initGunVideo();
+
+// ページ読み込み後に初期化
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initGunVideo);
+} else {
+  initGunVideo();
+}
 
 /* -----------------------------
-   3) ガチャを引くボタン：銃動画再生→カード表示
+   3) ガチャを引くボタン:銃動画再生→カード表示
 ----------------------------- */
 gachaBtn?.addEventListener("click", async () => {
   if (locked) return;
+  console.log("🎰 Gacha button clicked!");
   triggerGacha();
 });
 
 /* -----------------------------
-   3.6) スワイプでガチャを引く（スマホ用）
+   3.6) スワイプでガチャを引く(スマホ用)
 ----------------------------- */
 function handleTouchStart(e) {
   touchStartY = e.touches[0].clientY;
@@ -105,6 +128,7 @@ function handleTouchEnd(e) {
   // 上スワイプ判定: 上方向に十分な距離、横移動は少なく、時間内
   if (deltaY > SWIPE_THRESHOLD && deltaX < SWIPE_THRESHOLD && deltaTime < SWIPE_TIME_LIMIT) {
     e.preventDefault();
+    console.log("👆 Swipe up detected!");
     showSwipeFeedback();
     triggerGacha();
   }
@@ -133,6 +157,7 @@ introEl?.addEventListener("touchend", handleTouchEnd, { passive: false });
 async function triggerGacha() {
   if (locked) return;
   locked = true;
+  console.log("🔒 Gacha locked, starting sequence...");
 
   // 前回のカードは消して、ボタンも隠す
   cardRevealEl.innerHTML = "";
@@ -142,34 +167,60 @@ async function triggerGacha() {
   if (gachaBtn) gachaBtn.style.display = "none";
   if (swipeHint) swipeHint.style.display = "none";
 
+  // 動画の準備状況をチェック
+  console.log("📹 Video ready:", videoReady, "| Load attempted:", videoLoadAttempted);
+  
+  // まだ動画をロードしていない場合は今すぐロード
+  if (!videoLoadAttempted && gunVideo) {
+    console.log("⚠️ Video not loaded yet, loading now...");
+    gunVideo.load();
+    videoLoadAttempted = true;
+    await wait(300); // ロード時間を待つ
+  }
+
   // 銃動画を表示
   gunContainer.classList.remove("isHidden");
+  console.log("👁️ Gun container visible");
   
   // 動画を最初から再生
   gunVideo.currentTime = 0;
-  gunVideo.muted = true; // ミュート必須（自動再生ポリシー対策）
+  gunVideo.muted = true; // ミュート必須(自動再生ポリシー対策)
+  
+  console.log("▶️ Attempting to play video...");
+  console.log("Video src:", gunVideo.src);
+  console.log("Video readyState:", gunVideo.readyState);
   
   // 動画再生を試行
   try {
-    await gunVideo.play();
+    const playPromise = gunVideo.play();
+    console.log("✅ Play initiated");
+    
+    await playPromise;
+    console.log("✅ Video playing successfully");
   } catch (e) {
-    console.log("play failed, retrying...", e);
-    // リトライ：少し待ってから再度試行
-    await wait(100);
+    console.warn("⚠️ First play attempt failed:", e);
+    
+    // リトライ: 少し待ってから再度試行
+    await wait(200);
     try {
+      console.log("🔄 Retrying play...");
       await gunVideo.play();
+      console.log("✅ Video playing after retry");
     } catch (e2) {
-      console.log("play blocked:", e2);
-      // それでも失敗したら直接カード表示へ
+      console.error("❌ Play blocked even after retry:", e2);
+      // それでも失敗したら動画をスキップしてカード表示へ
+      console.log("⏭️ Skipping video, going straight to card");
+      await wait(300); // 少しだけ待つ
       onGunVideoEnded();
     }
   }
 }
 
 /* -----------------------------
-   4) 動画終了：フェード→カード
+   4) 動画終了:フェード→カード
 ----------------------------- */
 async function onGunVideoEnded() {
+  console.log("🎬 Video ended, transitioning to card...");
   introEl.classList.add("fadeout");
 
   await wait(120);
@@ -179,15 +230,18 @@ async function onGunVideoEnded() {
   setTimeout(() => {
     introEl.style.display = "none";
     locked = false;
+    console.log("🔓 Gacha unlocked");
   }, 560);
 }
 
 gunVideo?.addEventListener("ended", onGunVideoEnded);
 
 /* -----------------------------
-   5) もう一度引く：開始画面へ戻す
+   5) もう一度引く:開始画面へ戻す
 ----------------------------- */
 function resetToIntro() {
+  console.log("🔄 Resetting to intro...");
+  
   // カードを消して、ボタンも消す
   cardRevealEl.innerHTML = "";
   afterControlsEl.hidden = true;
@@ -206,12 +260,13 @@ function resetToIntro() {
   if (swipeHint) swipeHint.style.display = "";
 
   locked = false;
+  console.log("✅ Reset complete");
 }
 
 againBtn?.addEventListener("click", resetToIntro);
 
 /* -----------------------------
-   6) コレクション保存（当てたものだけ表示）
+   6) コレクション保存(当てたものだけ表示)
 ----------------------------- */
 function loadCollection() {
   try {
@@ -232,7 +287,7 @@ function addToCollection(card) {
 function renderCollection() {
   const map = loadCollection();
 
-  // 当てたものだけ表示（未入手は出さない）
+  // 当てたものだけ表示(未入手は出さない)
   const owned = CARDS
     .map((c) => ({ card: c, count: map[c.id] || 0 }))
     .filter((x) => x.count > 0)
@@ -286,10 +341,11 @@ resetCollectionBtn?.addEventListener("click", () => {
 });
 
 /* -----------------------------
-   7) 裏→表フリップ表示（毎回同確率）
+   7) 裏→表フリップ表示(毎回同確率)
 ----------------------------- */
 function revealPullWithFlip() {
   const card = pickUniform(CARDS);
+  console.log("🎴 Drew card:", card.name, `(${card.rarity})`);
   addToCollection(card);
 
   const frontCardNode = renderCard(card);
@@ -329,7 +385,7 @@ function addHistory(card) {
 }
 
 /* -----------------------------
-   ホロカード（poke-holo風）
+   ホロカード(poke-holo風)
 ----------------------------- */
 function renderCard(card) {
   const wrap = document.createElement("div");
@@ -387,3 +443,7 @@ function attachHoloPointer(cardRoot) {
     reset();
   });
 }
+
+// 初期化完了ログ
+console.log("✅ App initialized successfully");
+console.log("📦 Total cards available:", CARDS.length);
