@@ -147,39 +147,21 @@ async function triggerGacha() {
   
   // 動画を最初から再生
   gunVideo.currentTime = 0;
-  gunVideo.muted = true;
+  gunVideo.muted = true; // ミュート必須（自動再生ポリシー対策）
   
   // 動画再生を試行
   try {
     await gunVideo.play();
-    
-    // ★★★ ここが重要：ended イベントを待つ ★★★
-    await new Promise((resolve) => {
-      gunVideo.addEventListener('ended', resolve, { once: true });
-    });
-    
-    // 動画終了後の処理
-    await onGunVideoEnded();
-    
   } catch (e) {
     console.log("play failed, retrying...", e);
     // リトライ：少し待ってから再度試行
     await wait(100);
     try {
       await gunVideo.play();
-      
-      // ★★★ リトライ成功時も ended を待つ ★★★
-      await new Promise((resolve) => {
-        gunVideo.addEventListener('ended', resolve, { once: true });
-      });
-      
-      await onGunVideoEnded();
-      
     } catch (e2) {
-      console.log("play blocked, skipping video:", e2);
-      // それでも失敗したら動画なしで直接カード表示へ
-      await wait(500); // 動画の代わりの待機時間
-      await onGunVideoEnded();
+      console.log("play blocked:", e2);
+      // それでも失敗したら直接カード表示へ
+      onGunVideoEnded();
     }
   }
 }
@@ -199,8 +181,8 @@ async function onGunVideoEnded() {
     locked = false;
   }, 560);
 }
-// この行を削除（もう不要）
-// gunVideo?.addEventListener("ended", onGunVideoEnded);
+
+gunVideo?.addEventListener("ended", onGunVideoEnded);
 
 /* -----------------------------
    5) もう一度引く：開始画面へ戻す
@@ -229,7 +211,7 @@ function resetToIntro() {
 againBtn?.addEventListener("click", resetToIntro);
 
 /* -----------------------------
-   6) コレクション保存（当てたもの だけ表示）
+   6) コレクション保存（当てたものだけ表示）
 ----------------------------- */
 function loadCollection() {
   try {
@@ -250,7 +232,7 @@ function addToCollection(card) {
 function renderCollection() {
   const map = loadCollection();
 
-  // 当てたもの だけ表示（未入手は出さない）
+  // 当てたものだけ表示（未入手は出さない）
   const owned = CARDS
     .map((c) => ({ card: c, count: map[c.id] || 0 }))
     .filter((x) => x.count > 0)
@@ -405,5 +387,3 @@ function attachHoloPointer(cardRoot) {
     reset();
   });
 }
-
-
