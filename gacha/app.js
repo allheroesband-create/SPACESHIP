@@ -57,12 +57,20 @@ function pickUniform(cards) {
 }
 
 /* -----------------------------
-   2) 銃：初期化
+   2) 銃：初期化（プリロード）
 ----------------------------- */
+let videoReady = false;
+
 function initGunVideo() {
   if (!gunVideo) return;
-  gunVideo.pause();
-  gunVideo.currentTime = 0;
+  
+  // 動画の準備完了を監視
+  gunVideo.addEventListener("canplaythrough", () => {
+    videoReady = true;
+  }, { once: true });
+  
+  // 強制的にロード開始
+  gunVideo.load();
 }
 initGunVideo();
 
@@ -134,22 +142,27 @@ async function triggerGacha() {
   if (gachaBtn) gachaBtn.style.display = "none";
   if (swipeHint) swipeHint.style.display = "none";
 
-  // 銃動画を表示して再生
+  // 銃動画を表示
   gunContainer.classList.remove("isHidden");
+  
+  // 動画を最初から再生
   gunVideo.currentTime = 0;
+  gunVideo.muted = true; // ミュート必須（自動再生ポリシー対策）
   
-  // 少し待ってから再生（DOMの更新を待つ）
-  await wait(50);
-  
+  // 動画再生を試行
   try {
-    const playPromise = gunVideo.play();
-    if (playPromise !== undefined) {
-      await playPromise;
-    }
+    await gunVideo.play();
   } catch (e) {
-    console.log("play blocked:", e);
-    // 再生できない場合は直接カード表示へ
-    onGunVideoEnded();
+    console.log("play failed, retrying...", e);
+    // リトライ：少し待ってから再度試行
+    await wait(100);
+    try {
+      await gunVideo.play();
+    } catch (e2) {
+      console.log("play blocked:", e2);
+      // それでも失敗したら直接カード表示へ
+      onGunVideoEnded();
+    }
   }
 }
 
