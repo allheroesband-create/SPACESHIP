@@ -793,10 +793,6 @@ body::before{
 }
 
 .card[data-rarity="shiny vmax"] .card__glare:after {
-  -webkit-mask-image: var(--mask);
-  mask-image: var(--mask);
-  -webkit-mask-size: cover;
-  mask-size: cover;
 
   background-image: 
     radial-gradient( 
@@ -890,10 +886,6 @@ body::before{
 }
 
 .card[data-rarity="amazing rare"] .card__glare:after {
-  -webkit-mask-image: var(--mask);
-  mask-image: var(--mask);
-  -webkit-mask-size: cover;
-  mask-size: cover;
 
   background-image: 
     radial-gradient( 
@@ -1060,9 +1052,9 @@ body::before{
 
   background-size: var(--glittersize) var(--glittersize), var(--glittersize) var(--glittersize), cover, cover;
   background-position: 45% 45%, 55% 55%, center center, center center;
-  background-blend-mode: soft-light, hard-light, overlay;
-  mix-blend-mode: color-dodge;
-  filter: brightness(calc( 0.4 + (var(--pointer-from-center) * 0.2) )) contrast(1) saturate(2.7);
+  background-blend-mode: soft-light, soft-light, overlay;  /* hard-lightを削除 */
+  mix-blend-mode: screen;  /* color-dodgeから変更 */
+  filter: brightness(calc( 0.35 + (var(--pointer-from-center) * 0.2) )) contrast(1) saturate(2);  /* 明るさを抑える */
 
 }
 
@@ -1084,11 +1076,11 @@ body::before{
 
   background-size: var(--imgsize), cover, cover;
   background-position: center center, center center, center center;
-  background-blend-mode: hard-light, multiply;
+  background-blend-mode: soft-light, multiply;  /* hard-lightを変更 */
 
   mix-blend-mode: lighten;
-  filter: brightness(1.25) contrast(1.25) saturate(0.35);
-  opacity: .8;
+  filter: brightness(0.95) contrast(1.15) saturate(0.5);  /* 明るさを抑える */
+  opacity: .5;  /* 不透明度を下げる */
 
 }
 
@@ -1313,7 +1305,6 @@ body::before{
 .card[data-rarity="rare holo vstar"] .card__shine,
 .card[data-rarity="rare holo vstar"] .card__shine:after {
 
-  --mask: none;
   --foil: linear-gradient(135deg, transparent 20%, rgba(255,255,255,0.15) 50%, transparent 80%); 
   --imgsize: 18% 15%;
 
@@ -1466,10 +1457,6 @@ body::before{
 .card[data-rarity="rare shiny vmax"] .card__glare:after {
 	
   content: "";
-  -webkit-mask-image: var(--mask);
-  mask-image: var(--mask);
-	-webkit-mask-size: cover;
-  mask-size: cover;
 
 	background-image: 
 		radial-gradient( 
@@ -1544,9 +1531,9 @@ body::before{
     center center, 
     center center;
     
-  background-blend-mode: screen, soft-light, hard-light, overlay;
-  mix-blend-mode: color-dodge;
-  filter: brightness(calc( 0.5 + (var(--pointer-from-center) * 0.3) )) contrast(1.2) saturate(2);
+  background-blend-mode: overlay, soft-light, soft-light, overlay;
+  mix-blend-mode: screen;  /* color-dodgeから変更：より柔らかい光 */
+  filter: brightness(calc( 0.4 + (var(--pointer-from-center) * 0.2) )) contrast(1.1) saturate(1.5);  /* 明るさを抑制 */
 }
 
 .card[data-rarity="rare secret"] .card__shine:before {
@@ -1564,11 +1551,11 @@ body::before{
     calc(var(--background-x) * 1.5) calc(var(--background-y) * 1.5),
     center center, 
     center center;
-  background-blend-mode: overlay, hard-light, multiply;
+  background-blend-mode: overlay, soft-light, multiply;  /* hard-lightをsoft-lightに変更 */
 
   mix-blend-mode: lighten;
-  filter: brightness(1.4) contrast(1.3) saturate(0.5);
-  opacity: .85;
+  filter: brightness(1.0) contrast(1.1) saturate(0.6);  /* 明るさを大幅に抑制 */
+  opacity: .55;  /* 不透明度を下げて光を抑える */
 }
 
 /* ===============================================
@@ -1737,12 +1724,13 @@ body::before{
   background-image: 
     radial-gradient( 
       farthest-corner circle at var(--pointer-x) var(--pointer-y), 
-      hsla(45, 80%, 85%, 0.4) 0%, 
-      hsla(45, 40%, 50%, 0.2) 30%,
+      hsla(45, 60%, 70%, 0.25) 0%,  /* 明度と不透明度を下げる */
+      hsla(45, 30%, 40%, 0.15) 30%, /* 明度と不透明度を下げる */
       hsl(22, 15%, 12%) 180%
     );
-  filter: brightness(1.5) contrast(1.8);
-  mix-blend-mode: hard-light;
+  filter: brightness(0.9) contrast(1.3);  /* 明るさを大幅に下げる */
+  mix-blend-mode: overlay;  /* hard-lightからoverlayに変更：より柔らかい */
+  opacity: 0.7;  /* 全体の不透明度を下げる */
 }
 
 .card[data-rarity="rare shiny vmax"] .card__glare {
@@ -1836,7 +1824,7 @@ body::before{
 */
 
 /* より大きいパターンを好む場合は、以下のコメントを外してください */
-
+/*
 .card[data-rarity="rare holo vstar"] .card__shine {
   background-size: 
     30% 30%,  !* 大きいwave *!
@@ -1854,4 +1842,3 @@ body::before{
     cover;
 }
 */
-
