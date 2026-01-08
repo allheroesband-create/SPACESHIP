@@ -30,6 +30,18 @@
             playsinline
           ></video>
         </button>
+
+        <!-- ガチャを引くボタン追加 -->
+        <button id="gachaBtn" class="gachaBtn">
+          <span class="gachaBtn__icon">🎰</span>
+          <span class="gachaBtn__text">ガチャを引く</span>
+        </button>
+
+        <!-- スワイプヒント（スマホ用） -->
+        <div class="swipeHint">
+          <span class="swipeHint__arrow">👆</span>
+          <span class="swipeHint__text">SWIPE UP TO DRAW</span>
+        </div>
       </section>
 
       <!-- カード表示エリア -->
@@ -41,9 +53,6 @@
           <button id="againBtn" class="btn">もう一度引く</button>
           <button id="collectionBtn" class="btn ghost">コレクションを見る</button>
         </div>
-
-        <!-- デバッグ用（残したいならそのまま） -->
-        
 
         <div id="history" class="history"></div>
       </section>
@@ -74,4 +83,3 @@
     <script type="module" src="./app.js"></script>
   </body>
 </html>
-
