@@ -498,8 +498,14 @@ function addHistory(card) {
 // レアリティからCSSのdata-rarity属性へのマッピング
 const RARITY_EFFECT_MAP = {
   "Special": "rare secret",           // ゴールドエフェクト
-  "Colonel": "rare shiny vmax",       // シャイニーVMAXエフェクト
-  "Lieutenant Colonel": "rare holo vstar"  // V-STARエフェクト
+  "Colonel": "rare shiny vmax",       // シャイニーVMAXエフェクト（文字保護付き）
+  "Lieutenant Colonel": "rare holo vstar"  // V-STARエフェクト（文字保護付き）
+};
+
+const RARITY_TEXTURE_INFO = {
+  "Special": "Galaxy texture - フル動作",
+  "Colonel": "VMAX pattern (25%) - 限定的な動き、文字部分保護",
+  "Lieutenant Colonel": "Wave pattern (20%) - 限定的な動き、文字部分保護"
 };
 
 function renderCard(card) {
@@ -510,7 +516,10 @@ function renderCard(card) {
   const effectRarity = RARITY_EFFECT_MAP[card.rarity] || "common";
   wrap.setAttribute("data-rarity", effectRarity);
   
-  console.log(`🎴 Card rarity: ${card.rarity} → Effect: ${effectRarity}`);
+  console.log(`🎴 Card: ${card.name}`);
+  console.log(`   Rarity: ${card.rarity}`);
+  console.log(`   Effect: ${effectRarity}`);
+  console.log(`   Texture: ${RARITY_TEXTURE_INFO[card.rarity] || "None"}`);
   
   wrap.innerHTML = `
     <div class="card__translater">
