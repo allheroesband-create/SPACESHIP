@@ -416,8 +416,8 @@ function renderCollection() {
     const el = document.createElement("div");
     el.className = "collectItem";
     
-    // カードをホロエフェクト付きで表示（ただしポインター追跡は無効）
-    const cardNode = renderCardStatic(card);  // 静的バージョンを使用
+    // カードをホロエフェクト付きで表示（仮想ポインター追跡あり）
+    const cardNode = renderCardStatic(card);
     cardNode.classList.add("collectCard");
     
     const metaNode = document.createElement("div");
@@ -432,7 +432,78 @@ function renderCollection() {
     
     el.appendChild(cardNode);
     el.appendChild(metaNode);
+    
+    // クリックイベント: カード詳細を表示
+    el.addEventListener("click", () => {
+      showCardDetail(card);
+    });
+    
+    el.style.cursor = "pointer";
+    
     collectionGrid.appendChild(el);
+  }
+}
+
+/* -----------------------------
+   カード詳細表示モーダル
+----------------------------- */
+function showCardDetail(card) {
+  // 既存のモーダルがあれば削除
+  const existingModal = document.getElementById("cardDetailModal");
+  if (existingModal) {
+    existingModal.remove();
+  }
+  
+  // モーダルを作成
+  const modal = document.createElement("div");
+  modal.id = "cardDetailModal";
+  modal.className = "modal cardDetailModal";
+  
+  modal.innerHTML = `
+    <div class="modal__backdrop" data-close-detail="1"></div>
+    <div class="modal__panel modal__panel--card">
+      <button class="closeDetailBtn" data-close-detail="1" aria-label="閉じる">✕</button>
+      <div id="cardDetailContainer" class="cardDetailContainer"></div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // カードを描画（フルインタラクティブ版）
+  const cardContainer = modal.querySelector("#cardDetailContainer");
+  const cardNode = renderCard(card);
+  cardNode.classList.add("cardDetail");
+  cardContainer.appendChild(cardNode);
+  
+  // モーダルを表示
+  requestAnimationFrame(() => {
+    modal.classList.add("active");
+  });
+  
+  // 閉じるイベント
+  modal.addEventListener("click", (e) => {
+    if (e.target.dataset.closeDetail) {
+      closeCardDetail();
+    }
+  });
+  
+  // ESCキーで閉じる
+  const escHandler = (e) => {
+    if (e.key === "Escape") {
+      closeCardDetail();
+      document.removeEventListener("keydown", escHandler);
+    }
+  };
+  document.addEventListener("keydown", escHandler);
+}
+
+function closeCardDetail() {
+  const modal = document.getElementById("cardDetailModal");
+  if (modal) {
+    modal.classList.remove("active");
+    setTimeout(() => {
+      modal.remove();
+    }, 300);
   }
 }
 
@@ -440,14 +511,14 @@ function renderCollection() {
    ホロカード（レアリティ別エフェクト）- 静的バージョン
 ----------------------------- */
 
-// コレクション用: マウス/タッチ追跡なし、アニメーションのみ
+// コレクション用: マウス位置を仮想的にアニメーション、3D回転なし
 function renderCardStatic(card) {
   const wrap = document.createElement("div");
-  wrap.className = "card card--static";  // 静的カード用のクラスを追加
+  wrap.className = "card card--static";
   
-  // レアリティに応じたエフェクトを設定
   const effectRarity = RARITY_EFFECT_MAP[card.rarity] || "common";
   wrap.setAttribute("data-rarity", effectRarity);
+  wrap.setAttribute("data-card-id", card.id);
   
   console.log(`🎴 Collection card rarity: ${card.rarity} → Effect: ${effectRarity} (static)`);
   
@@ -455,9 +526,9 @@ function renderCardStatic(card) {
     <div class="card__translater">
       <div class="card__rotator card__rotator--static">
         <div class="card__front">
-          <img class="card__image" src="${card.image}" alt="${escapeHtml(card.name)}" />
           <div class="card__shine"></div>
           <div class="card__glare"></div>
+          <img class="card__image card__image--overlay" src="${card.image}" alt="${escapeHtml(card.name)}" />
           <div class="card__meta">
             <span class="card__name">${escapeHtml(card.name)}</span>
             <span class="card__rarity">${escapeHtml(card.rarity)}</span>
@@ -467,8 +538,71 @@ function renderCardStatic(card) {
     </div>
   `;
   
-  // attachHoloPointer は呼び出さない（ポインター追跡なし）
+  // 仮想マウス位置のアニメーションを適用
+  attachVirtualPointer(wrap);
+  
   return wrap;
+}
+
+/* -----------------------------
+   仮想ポインター（コレクション用）
+----------------------------- */
+function attachVirtualPointer(cardRoot) {
+  let animationId = null;
+  let time = Math.random() * 1000; // ランダムな開始時間でずらす
+  
+  function animate() {
+    time += 0.016; // 約60fps
+    
+    // 円形の動きでマウス位置を仮想的にアニメーション
+    const speed = 0.3; // 動きの速度
+    const px = 0.5 + Math.sin(time * speed) * 0.3; // 0.2 ~ 0.8の範囲
+    const py = 0.5 + Math.cos(time * speed * 0.7) * 0.3; // 0.2 ~ 0.8の範囲
+    
+    const centerX = px - 0.5;
+    const centerY = py - 0.5;
+    const distanceFromCenter = Math.sqrt(centerX * centerX + centerY * centerY) * 1.414;
+
+    // CSS変数を設定（3D回転は除く）
+    cardRoot.style.setProperty("--pointer-x", `${px * 100}%`);
+    cardRoot.style.setProperty("--pointer-y", `${py * 100}%`);
+    cardRoot.style.setProperty("--pointer-from-left", px);
+    cardRoot.style.setProperty("--pointer-from-top", py);
+    cardRoot.style.setProperty("--pointer-from-center", distanceFromCenter);
+    
+    cardRoot.style.setProperty("--background-x", `${px * 100}%`);
+    cardRoot.style.setProperty("--background-y", `${py * 100}%`);
+    
+    cardRoot.style.setProperty("--card-opacity", "1");
+    
+    // posx, posyも設定（glareエフェクト用）
+    cardRoot.style.setProperty("--posx", `${px * 100}%`);
+    cardRoot.style.setProperty("--posy", `${py * 100}%`);
+    cardRoot.style.setProperty("--mx", `${px * 100}%`);
+    cardRoot.style.setProperty("--my", `${py * 100}%`);
+    
+    animationId = requestAnimationFrame(animate);
+  }
+  
+  // アニメーション開始
+  animate();
+  
+  // カードが削除される時にアニメーションを停止
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.removedNodes.forEach((node) => {
+        if (node === cardRoot || node.contains(cardRoot)) {
+          if (animationId) {
+            cancelAnimationFrame(animationId);
+          }
+        }
+      });
+    });
+  });
+  
+  if (cardRoot.parentElement) {
+    observer.observe(cardRoot.parentElement, { childList: true });
+  }
 }
 
 function openCollection() {
