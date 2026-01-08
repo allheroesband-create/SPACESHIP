@@ -347,30 +347,31 @@ if (gunVideo) {
 }
 
 /* -----------------------------
-   5) もう一度引く
+   5) もう一度引く：動画から再開
 ----------------------------- */
-function resetToIntro() {
-  console.log("🔄 === RESET TO INTRO ===");
+function resetAndGacha() {
+  console.log("🔄 === AGAIN BUTTON: STARTING NEW GACHA ===");
   
+  // カードとボタンを隠す
   cardRevealEl.innerHTML = "";
   afterControlsEl.hidden = true;
 
+  // イントロを一瞬表示してから動画開始
   introEl.style.display = "grid";
   introEl.classList.remove("fadeout");
-
-  console.log("Hiding gun container");
+  
+  // 動画コンテナをリセット
   gunContainer.classList.add("isHidden");
   gunVideo.pause();
   gunVideo.currentTime = 0;
 
-  if (gachaBtn) gachaBtn.style.display = "";
-  if (swipeHint) swipeHint.style.display = "";
-
-  locked = false;
-  console.log("✅ Reset complete");
+  // 少し待ってからガチャ開始（スムーズな遷移のため）
+  setTimeout(() => {
+    triggerGacha();
+  }, 100);
 }
 
-againBtn?.addEventListener("click", resetToIntro);
+againBtn?.addEventListener("click", resetAndGacha);
 
 /* -----------------------------
    6) コレクション保存
@@ -491,11 +492,26 @@ function addHistory(card) {
 }
 
 /* -----------------------------
-   ホロカード
+   ホロカード（レアリティ別エフェクト）
 ----------------------------- */
+
+// レアリティからCSSのdata-rarity属性へのマッピング
+const RARITY_EFFECT_MAP = {
+  "Special": "rare secret",           // ゴールドエフェクト
+  "Colonel": "rare shiny vmax",       // シャイニーVMAXエフェクト
+  "Lieutenant Colonel": "rare holo vstar"  // V-STARエフェクト
+};
+
 function renderCard(card) {
   const wrap = document.createElement("div");
   wrap.className = "card";
+  
+  // レアリティに応じたエフェクトを設定
+  const effectRarity = RARITY_EFFECT_MAP[card.rarity] || "common";
+  wrap.setAttribute("data-rarity", effectRarity);
+  
+  console.log(`🎴 Card rarity: ${card.rarity} → Effect: ${effectRarity}`);
+  
   wrap.innerHTML = `
     <div class="card__translater">
       <button class="card__rotator" type="button" aria-label="${escapeHtml(card.name)}">
@@ -526,7 +542,24 @@ function attachHoloPointer(cardRoot) {
 
     const ry = (px - 0.5) * -18;
     const rx = (py - 0.5) * 18;
+    
+    // 中心からの距離を計算
+    const centerX = px - 0.5;
+    const centerY = py - 0.5;
+    const distanceFromCenter = Math.sqrt(centerX * centerX + centerY * centerY) * 1.414; // 0-1の範囲
 
+    // すべての必要なCSS変数を設定
+    cardRoot.style.setProperty("--pointer-x", `${px * 100}%`);
+    cardRoot.style.setProperty("--pointer-y", `${py * 100}%`);
+    cardRoot.style.setProperty("--pointer-from-left", px);
+    cardRoot.style.setProperty("--pointer-from-top", py);
+    cardRoot.style.setProperty("--pointer-from-center", distanceFromCenter);
+    
+    cardRoot.style.setProperty("--background-x", `${px * 100}%`);
+    cardRoot.style.setProperty("--background-y", `${py * 100}%`);
+    
+    cardRoot.style.setProperty("--card-opacity", "1");
+    
     rotator.style.setProperty("--posx", `${px * 100}%`);
     rotator.style.setProperty("--posy", `${py * 100}%`);
     rotator.style.setProperty("--mx", `${px * 100}%`);
@@ -540,6 +573,7 @@ function attachHoloPointer(cardRoot) {
     rotator.style.setProperty("--rx", `0deg`);
     rotator.style.setProperty("--ry", `0deg`);
     rotator.style.setProperty("--o", `0`);
+    cardRoot.style.setProperty("--card-opacity", "0.5");
   }
 
   rotator.addEventListener("pointermove", setVarsFromEvent);
@@ -556,15 +590,9 @@ console.log("🎬 Ready to gacha!");
 console.log("");
 console.log("💡 Debug tips:");
 console.log("- Type 'showCard()' in console to manually show a card");
-console.log("- Type 'resetIntro()' in console to reset to intro screen");
 
 // デバッグ用のグローバル関数
 window.showCard = () => {
   console.log("🎴 Manual card trigger");
   onGunVideoEnded();
-};
-
-window.resetIntro = () => {
-  console.log("🔄 Manual reset trigger");
-  resetToIntro();
 };
