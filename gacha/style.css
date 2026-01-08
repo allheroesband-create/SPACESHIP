@@ -2125,35 +2125,36 @@ body::before{
           drop-shadow(0 0 30px rgba(180, 200, 255, 0.2));
 }
 
-/* コレクション内のカードにもアニメーションを適用 */
-.collectItem .card[data-rarity="rare secret"] .card__shine,
-.collectItem .card[data-rarity="rare shiny vmax"] .card__shine,
-.collectItem .card[data-rarity="rare holo vstar"] .card__shine {
+/* コレクション内のカードにもアニメーションを適用（ポインター追跡なし） */
+.collectItem .card--static[data-rarity="rare secret"] .card__shine,
+.collectItem .card--static[data-rarity="rare shiny vmax"] .card__shine,
+.collectItem .card--static[data-rarity="rare holo vstar"] .card__shine {
   animation: glitterShimmer 4s ease-in-out infinite;
 }
 
-.collectItem .card.active[data-rarity="rare secret"] .card__shine {
-  animation: secretGlow 2.5s ease-in-out infinite;
+/* コレクション内の静的カードは常にグロウアニメーション */
+.collectItem .card--static[data-rarity="rare secret"] .card__shine {
+  animation: secretGlow 2.5s ease-in-out infinite, glitterShimmer 4s ease-in-out infinite;
 }
 
-.collectItem .card.active[data-rarity="rare shiny vmax"] .card__shine {
-  animation: vmaxGlow 3s ease-in-out infinite;
+.collectItem .card--static[data-rarity="rare shiny vmax"] .card__shine {
+  animation: vmaxGlow 3s ease-in-out infinite, glitterShimmer 4s ease-in-out infinite;
 }
 
-.collectItem .card.active[data-rarity="rare holo vstar"] .card__shine {
-  animation: vstarGlow 2.8s ease-in-out infinite;
+.collectItem .card--static[data-rarity="rare holo vstar"] .card__shine {
+  animation: vstarGlow 2.8s ease-in-out infinite, glitterShimmer 4s ease-in-out infinite;
 }
 
-/* コレクション内のカードのホバー効果 */
-.collectItem:hover .card[data-rarity="rare secret"] {
+/* コレクション内のカードのホバー効果（ドロップシャドウのみ） */
+.collectItem:hover .card--static[data-rarity="rare secret"] {
   filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
 }
 
-.collectItem:hover .card[data-rarity="rare shiny vmax"] {
+.collectItem:hover .card--static[data-rarity="rare shiny vmax"] {
   filter: drop-shadow(0 0 12px rgba(200, 150, 255, 0.5));
 }
 
-.collectItem:hover .card[data-rarity="rare holo vstar"] {
+.collectItem:hover .card--static[data-rarity="rare holo vstar"] {
   filter: drop-shadow(0 0 12px rgba(150, 220, 255, 0.5));
 }
 
@@ -2196,9 +2197,59 @@ body::before{
   padding: 6px 8px;
 }
 
-/* コレクション内のカードはtouch-action: noneでスクロールを防止 */
-.collectItem .card__rotator {
-  touch-action: none;
+/* 静的カード: ポインター追跡エフェクトを無効化 */
+.card--static {
+  /* デフォルトのCSS変数値を設定（中央固定） */
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --pointer-from-left: 0.5;
+  --pointer-from-top: 0.5;
+  --pointer-from-center: 0;
+  --background-x: 50%;
+  --background-y: 50%;
+  --card-opacity: 1;
+}
+
+/* 静的カードのrotatorは回転しない */
+.card__rotator--static {
+  --rx: 0deg;
+  --ry: 0deg;
+  --o: 0.3;  /* 常に少しだけエフェクトを表示 */
+}
+
+/* 静的カードではactiveクラスの効果を無効化 */
+.card--static.active .card__shine {
+  /* activeクラスがついても、アニメーションのみ有効 */
+  animation: glitterShimmer 4s ease-in-out infinite;
+}
+
+/* 静的カードではホバー時の3D変形を無効化 */
+.collectItem .card--static:hover {
+  transform: none;
+  filter: none;
+}
+
+/* コレクション内のカードのホロエフェクト強度を固定 */
+.card--static .card__shine {
+  /* アニメーションは有効だが、ポインター追跡は無効 */
+  opacity: 0.7;  /* 固定の不透明度 */
+}
+
+.card--static .card__glare {
+  /* グレアも固定表示 */
+  opacity: 0.4;  /* 控えめなグレア */
+}
+
+/* コレクション内のカードはtouch-action: autoでスクロール可能 */
+.collectItem .card__rotator--static {
+  touch-action: auto;
+  pointer-events: none;  /* ポインターイベントを無効化 */
+}
+
+/* コレクションアイテム全体はクリック可能に */
+.collectItem {
+  cursor: default;
+  touch-action: auto;
 }
 
 
@@ -2237,4 +2288,48 @@ body::before{
 
 .collectItem .card {
   touch-action: none;
+}
+
+
+/* ===============================================
+   静的カード（コレクション用）の固定エフェクト
+   =============================================== */
+
+/* 静的カードのshineレイヤーは中央固定で表示 */
+.card--static[data-rarity="rare secret"] .card__shine,
+.card--static[data-rarity="rare shiny vmax"] .card__shine,
+.card--static[data-rarity="rare holo vstar"] .card__shine {
+  /* CSS変数が中央固定なので、エフェクトも中央で固定表示 */
+  opacity: 0.8;
+}
+
+.card--static[data-rarity="rare secret"] .card__shine:before,
+.card--static[data-rarity="rare shiny vmax"] .card__shine:before,
+.card--static[data-rarity="rare holo vstar"] .card__shine:before {
+  opacity: 0.7;
+}
+
+.card--static[data-rarity="rare secret"] .card__shine:after,
+.card--static[data-rarity="rare shiny vmax"] .card__shine:after,
+.card--static[data-rarity="rare holo vstar"] .card__shine:after {
+  opacity: 0.5;
+}
+
+/* 静的カードのglareは控えめに */
+.card--static .card__glare {
+  opacity: 0.3;
+  filter: brightness(1) contrast(1);
+}
+
+.card--static .card__glare:after {
+  opacity: 0.2;
+}
+
+/* 静的カードは3D変形しない */
+.card--static .card__translater {
+  transform: none !important;
+}
+
+.card--static .card__rotator {
+  transform: none !important;
 }
