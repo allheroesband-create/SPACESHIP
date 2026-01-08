@@ -6,7 +6,8 @@ export const CARDS = [
     id: "diddy",
     name: "DIDDY",
     rarity: "Special",
-    image: "./assets/DIDDY.png"
+    image: "./assets/DIDDY.png",
+    overlayImage: "./assets/DIDDY_overlay.png"
   },
   {
     id: "elon_musk",
@@ -47,7 +48,8 @@ export const CARDS = [
     id: "epstein",
     name: "JEFFREY EPSTEIN",
     rarity: "Special",
-    image: "./assets/Epstein.png"
+    image: "./assets/Epstein.png",
+    overlayImage: "./assets/Epstein_overlay.png"
   },
   {
     id: "peter_thiel",
@@ -71,6 +73,7 @@ export const CARDS = [
     overlayImage: "./assets/EDWARD_SNOWDEN_overlay.png"
   },
 ];
+
 
 
 
