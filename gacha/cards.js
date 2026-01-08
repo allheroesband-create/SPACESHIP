@@ -19,6 +19,7 @@ export const CARDS = [
     name: "RIGHT HAND",
     rarity: "Colonel",
     image: "./assets/RIGHT_HAND.png"
+    overlayImage: "./assets/RIGHT_HAND_overlay.png"
   },
   {
     id: "erica_kirk",
@@ -52,6 +53,7 @@ export const CARDS = [
     image: "./assets/Peter_Thiel2.png"
   }
 ];
+
 
 
 
