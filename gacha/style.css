@@ -1836,7 +1836,7 @@ body::before{
 */
 
 /* より大きいパターンを好む場合は、以下のコメントを外してください */
-/*
+
 .card[data-rarity="rare holo vstar"] .card__shine {
   background-size: 
     30% 30%,  !* 大きいwave *!
@@ -1854,3 +1854,4 @@ body::before{
     cover;
 }
 */
+
