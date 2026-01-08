@@ -12,7 +12,8 @@ export const CARDS = [
     id: "elon_musk",
     name: "ELON MUSK",
     rarity: "Colonel",
-    image: "./assets/ELON_MUSK2.png"
+    image: "./assets/ELON_MUSK2.png",
+    overlayImage: "./assets/ELON_MUSK2_overlay.png"
   },
   {
     id: "right_hand",
@@ -54,7 +55,22 @@ export const CARDS = [
     rarity: "Lieutenant Colonel",
     image: "./assets/Peter_Thiel2.png",
     overlayImage: "./assets/Peter_Thiel_overlay.png"
-  }
+  },
+  {
+    id: "nicolas_maduro",
+    name: "NICOLAS MADURO",
+    rarity: "Colonel",
+    image: "./assets/NIcolas_Maduro.png",
+    overlayImage: "./assets/Nicolas_Maduro_overlay.png"
+  },
+  {
+    id: "edward_snowden",
+    name: "EDWARD SNOWDEN",
+    rarity: "Colonel",
+    image: "./assets/EDWARD_SNOWDEN.png",
+    overlayImage: "./assets/EDWARD_SNOWDEN_overlay.png"
+  },
 ];
+
 
 
