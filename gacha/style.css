@@ -502,6 +502,8 @@ body::before{
   object-fit: cover;
   display: block;
   transform: translateZ(0.1px);
+  position: relative;
+  z-index: 1;
 }
 
 .card__shine,
@@ -510,6 +512,19 @@ body::before{
   inset: 0;
   border-radius: var(--radius);
   pointer-events: none;
+  z-index: 2;
+}
+
+/* オーバーレイ画像（存在する場合） */
+.card__overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 4;
+  pointer-events: none;
+  transform: translateZ(2px);
 }
 
 /* ---- DEFAULT HOLO EFFECT (Common/Uncommon) ---- */
@@ -916,6 +931,7 @@ body::before{
   background: rgba(0,0,0,0.55);
   backdrop-filter: blur(8px);
   transform: translateZ(20px);
+  z-index: 5;
   display: none !important; /* Hidden by default */
 }
 .card__name{ font-weight: 800; letter-spacing: 0.02em; }
@@ -2125,38 +2141,8 @@ body::before{
           drop-shadow(0 0 30px rgba(180, 200, 255, 0.2));
 }
 
-/* コレクション内のカードにもアニメーションを適用（ポインター追跡なし） */
-.collectItem .card--static[data-rarity="rare secret"] .card__shine,
-.collectItem .card--static[data-rarity="rare shiny vmax"] .card__shine,
-.collectItem .card--static[data-rarity="rare holo vstar"] .card__shine {
-  animation: glitterShimmer 4s ease-in-out infinite;
-}
-
-/* コレクション内の静的カードは常にグロウアニメーション */
-.collectItem .card--static[data-rarity="rare secret"] .card__shine {
-  animation: secretGlow 2.5s ease-in-out infinite, glitterShimmer 4s ease-in-out infinite;
-}
-
-.collectItem .card--static[data-rarity="rare shiny vmax"] .card__shine {
-  animation: vmaxGlow 3s ease-in-out infinite, glitterShimmer 4s ease-in-out infinite;
-}
-
-.collectItem .card--static[data-rarity="rare holo vstar"] .card__shine {
-  animation: vstarGlow 2.8s ease-in-out infinite, glitterShimmer 4s ease-in-out infinite;
-}
-
-/* コレクション内のカードのホバー効果（ドロップシャドウのみ） */
-.collectItem:hover .card--static[data-rarity="rare secret"] {
-  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
-}
-
-.collectItem:hover .card--static[data-rarity="rare shiny vmax"] {
-  filter: drop-shadow(0 0 12px rgba(200, 150, 255, 0.5));
-}
-
-.collectItem:hover .card--static[data-rarity="rare holo vstar"] {
-  filter: drop-shadow(0 0 12px rgba(150, 220, 255, 0.5));
-}
+/* コレクション内のカードにはエフェクトアニメーションは適用しない */
+/* エフェクトなしのシンプルな表示 */
 
 
 /* ===============================================
@@ -2184,20 +2170,10 @@ body::before{
   height: 100%;
 }
 
-/* コレクション内: エフェクトレイヤーを画像の下に配置 */
-.collectItem .card__shine,
-.collectItem .card__glare {
-  z-index: 1;  /* エフェクトを下に */
-}
-
-.collectItem .card__image--overlay {
-  position: absolute;
-  inset: 0;
+.collectItem .card__image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: 2;  /* 画像を上に */
-  pointer-events: none;  /* クリックイベントを透過 */
 }
 
 /* コレクション内のカードメタデータ位置調整 */
@@ -2205,52 +2181,25 @@ body::before{
   display: block !important;
   font-size: 11px;
   padding: 6px 8px;
-  z-index: 3;  /* メタデータを最上位に */
   position: relative;
+  z-index: 1;
 }
 
-/* 静的カード: 仮想ポインター追跡用の初期値 */
-.card--static {
-  /* CSS変数は仮想ポインターアニメーションで動的に更新される */
-  --pointer-x: 50%;
-  --pointer-y: 50%;
-  --pointer-from-left: 0.5;
-  --pointer-from-top: 0.5;
-  --pointer-from-center: 0;
-  --background-x: 50%;
-  --background-y: 50%;
-  --card-opacity: 1;
-  --posx: 50%;
-  --posy: 50%;
-  --mx: 50%;
-  --my: 50%;
+/* エフェクトなしカード: シンプルな表示 */
+.card--no-effect {
+  /* エフェクト用のCSS変数は不要 */
 }
 
-/* 静的カードのrotatorは回転しない */
-.card__rotator--static {
-  --rx: 0deg !important;  /* 3D回転を完全に無効化 */
-  --ry: 0deg !important;
-  --o: 0.8;  /* エフェクトの基本不透明度 */
-  transform: none !important;  /* 3D変形を無効化 */
+/* エフェクトなしカードのrotatorは通常の表示 */
+.card--no-effect .card__rotator {
+  transform: none !important;
+  box-shadow: 0px 10px 20px -8px rgba(0,0,0,0.6);
 }
 
-/* 静的カードではactiveクラスの効果を調整 */
-.card--static.active .card__shine {
-  animation: glitterShimmer 4s ease-in-out infinite;
-}
-
-/* 静的カードのホバー時は回転させない */
-.collectItem .card--static:hover {
-  transform: none;
-}
-
-/* コレクション内のカードのホロエフェクト強度 */
-.card--static .card__shine {
-  opacity: 0.85;  /* 仮想ポインターで動くので少し強めに */
-}
-
-.card--static .card__glare {
-  opacity: 0.6;  /* グレアも少し強めに */
+/* エフェクトなしカードにはshineとglareが存在しない */
+.card--no-effect .card__shine,
+.card--no-effect .card__glare {
+  display: none;
 }
 
 /* コレクションアイテム全体はクリック可能 */
@@ -2266,6 +2215,13 @@ body::before{
 
 .collectItem:active {
   transform: scale(0.98);
+}
+
+/* コレクション内のカードにホバー時の軽いシャドウ */
+.collectItem:hover .card__rotator {
+  box-shadow: 
+    0 0 20px rgba(255, 215, 120, 0.3),
+    0px 10px 20px -8px rgba(0,0,0,0.6);
 }
 
 
@@ -2308,53 +2264,22 @@ body::before{
 
 
 /* ===============================================
-   静的カード（コレクション用）の動的エフェクト
+   エフェクトなしカード（コレクション用）
    =============================================== */
 
-/* 静的カードのshineレイヤーは仮想ポインターで動的に変化 */
-.card--static[data-rarity="rare secret"] .card__shine,
-.card--static[data-rarity="rare shiny vmax"] .card__shine,
-.card--static[data-rarity="rare holo vstar"] .card__shine {
-  /* 仮想ポインターによりCSS変数が動的に変化するため、エフェクトも動く */
-  opacity: 0.9;
+/* エフェクトなしカードはシンプルな画像表示のみ */
+.card--no-effect .card__shine,
+.card--no-effect .card__glare,
+.card--no-effect .card__shine:before,
+.card--no-effect .card__shine:after,
+.card--no-effect .card__glare:after {
+  display: none !important;
 }
 
-.card--static[data-rarity="rare secret"] .card__shine:before,
-.card--static[data-rarity="rare shiny vmax"] .card__shine:before,
-.card--static[data-rarity="rare holo vstar"] .card__shine:before {
-  opacity: 0.8;
-}
-
-.card--static[data-rarity="rare secret"] .card__shine:after,
-.card--static[data-rarity="rare shiny vmax"] .card__shine:after,
-.card--static[data-rarity="rare holo vstar"] .card__shine:after {
-  opacity: 0.7;
-}
-
-/* 静的カードのglareも仮想ポインターで動く */
-.card--static .card__glare {
-  opacity: calc(0.5 + (var(--pointer-from-center) * 0.3));  /* 動的な不透明度 */
-  filter: brightness(1.1) contrast(1.2);
-}
-
-.card--static .card__glare:after {
-  opacity: calc(0.3 + (var(--pointer-from-center) * 0.2));
-}
-
-/* 静的カードは3D変形しない（重要） */
-.card--static .card__translater {
+/* エフェクトなしカードは3D変形しない */
+.card--no-effect .card__translater,
+.card--no-effect .card__rotator {
   transform: none !important;
-}
-
-.card--static .card__rotator {
-  transform: none !important;
-}
-
-/* 仮想ポインターによるエフェクトは有効 */
-.card--static .card__shine,
-.card--static .card__glare {
-  /* background-positionなどはCSS変数で制御されるため、自動的に動く */
-  transition: opacity 0.1s ease;
 }
 
 
@@ -2450,20 +2375,56 @@ body::before{
 }
 
 /* カード詳細内のカードは通常のインタラクティブカード */
+/* card__frontの配置を確実にする */
+.cardDetail .card__front {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* 画像はエフェクトの下に配置 */
 .cardDetail .card__image {
-  z-index: 1;  /* エフェクトの下 */
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transform: translateZ(0.1px);
+  display: block;
 }
 
 .cardDetail .card__shine,
 .cardDetail .card__glare {
-  z-index: 2;  /* エフェクトを上に */
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: var(--radius);
+}
+
+/* オーバーレイ画像があれば最上位に */
+.cardDetail .card__overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 4;
+  pointer-events: none;
+  transform: translateZ(2px);
 }
 
 .cardDetail .card__meta {
-  z-index: 3;  /* メタデータを最上位に */
+  position: relative;
+  z-index: 5;
   display: block !important;
   font-size: 13px;
   padding: 10px 12px;
+  align-self: end;
 }
 
 /* モバイル対応 */
