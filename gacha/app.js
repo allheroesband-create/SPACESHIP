@@ -3,9 +3,19 @@ import { CARDS } from "./cards.js";
 const STORAGE_KEY = "usa_freedom_colosseum_collection_v1";
 const $ = (sel) => document.querySelector(sel);
 
+/* -----------------------------
+   スワイプ検出用変数
+----------------------------- */
+let touchStartY = 0;
+let touchStartX = 0;
+let touchStartTime = 0;
+const SWIPE_THRESHOLD = 80; // スワイプと判定する最小距離(px)
+const SWIPE_TIME_LIMIT = 500; // スワイプの最大時間(ms)
+
 const introEl = $("#intro");
 const gunBtn = $("#gunBtn");
 const gunVideo = $("#gunVideo");
+const gachaBtn = $("#gachaBtn");
 
 const cardRevealEl = $("#cardReveal");
 const historyEl = $("#history");
@@ -85,13 +95,37 @@ gunBtn?.addEventListener("click", async () => {
 });
 
 /* -----------------------------
+   3.5) ガチャを引くボタン：即座にカード表示
+----------------------------- */
+gachaBtn?.addEventListener("click", async () => {
+  if (locked) return;
+  locked = true;
+
+  // 前回のカードは消して、ボタンも隠す
+  cardRevealEl.innerHTML = "";
+  afterControlsEl.hidden = true;
+
+  // イントロをフェードアウト
+  introEl.classList.add("fadeout");
+
+  await wait(120);
+  revealPullWithFlip();
+
+  // イントロを隠す
+  setTimeout(() => {
+    introEl.style.display = "none";
+    locked = false;
+  }, 560);
+});
+
+/* -----------------------------
    4) 動画終了：フェード→カード
 ----------------------------- */
 gunVideo?.addEventListener("ended", async () => {
   introEl.classList.add("fadeout");
 
   await wait(120);
-  revealPullWithFlip(); // ←ここで毎回ランダム（同確率）
+  revealPullWithFlip();
 
   // イントロを隠す
   setTimeout(() => {
@@ -200,7 +234,7 @@ resetCollectionBtn?.addEventListener("click", () => {
    7) 裏→表フリップ表示（毎回同確率）
 ----------------------------- */
 function revealPullWithFlip() {
-  const card = pickUniform(CARDS); // ←均等確率
+  const card = pickUniform(CARDS);
   addToCollection(card);
 
   const frontCardNode = renderCard(card);
@@ -223,7 +257,7 @@ function revealPullWithFlip() {
 
   requestAnimationFrame(() => {
     wrap.classList.add("reveal");
-    afterControlsEl.hidden = false; // ←カード出た後だけボタン出す
+    afterControlsEl.hidden = false;
   });
 }
 
