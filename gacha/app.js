@@ -211,7 +211,7 @@ function resetToIntro() {
 againBtn?.addEventListener("click", resetToIntro);
 
 /* -----------------------------
-   6) コレクション保存（当てたものだけ表示）
+   6) コレクション保存（当てたもの だけ表示）
 ----------------------------- */
 function loadCollection() {
   try {
@@ -232,7 +232,7 @@ function addToCollection(card) {
 function renderCollection() {
   const map = loadCollection();
 
-  // 当てたものだけ表示（未入手は出さない）
+  // 当てたもの だけ表示（未入手は出さない）
   const owned = CARDS
     .map((c) => ({ card: c, count: map[c.id] || 0 }))
     .filter((x) => x.count > 0)
