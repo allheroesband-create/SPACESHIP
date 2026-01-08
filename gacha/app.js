@@ -516,10 +516,21 @@ function renderCard(card) {
   const effectRarity = RARITY_EFFECT_MAP[card.rarity] || "common";
   wrap.setAttribute("data-rarity", effectRarity);
   
+  // オーバーレイ画像があるかチェック
+  const hasOverlay = !!card.overlayImage;
+  
   console.log(`🎴 Card: ${card.name}`);
   console.log(`   Rarity: ${card.rarity}`);
   console.log(`   Effect: ${effectRarity}`);
   console.log(`   Texture: ${RARITY_TEXTURE_INFO[card.rarity] || "None"}`);
+  if (hasOverlay) {
+    console.log(`   Overlay Image: ${card.overlayImage}`);
+  }
+  
+  // オーバーレイ画像のHTML（存在する場合のみ）
+  const overlayHtml = hasOverlay 
+    ? `<img class="card__overlay" src="${card.overlayImage}" alt="${escapeHtml(card.name)} overlay" />` 
+    : '';
   
   wrap.innerHTML = `
     <div class="card__translater">
@@ -528,6 +539,7 @@ function renderCard(card) {
           <img class="card__image" src="${card.image}" alt="${escapeHtml(card.name)}" />
           <div class="card__shine"></div>
           <div class="card__glare"></div>
+          ${overlayHtml}
           <div class="card__meta">
             <span class="card__name">${escapeHtml(card.name)}</span>
             <span class="card__rarity">${escapeHtml(card.rarity)}</span>
