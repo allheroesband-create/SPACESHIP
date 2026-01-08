@@ -2318,6 +2318,10 @@ body::before{
     0 20px 60px rgba(0, 0, 0, 0.8),
     0 0 100px rgba(255, 215, 120, 0.1);
   animation: cardDetailFadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes cardDetailFadeIn {
@@ -2366,12 +2370,24 @@ body::before{
   place-items: center;
   padding: 20px;
   min-height: 400px;
+  width: 100%;
 }
 
 .cardDetail {
   width: 100%;
   max-width: 350px;
   margin: 0 auto;
+}
+
+/* カードのアスペクト比を確保 */
+.cardDetail .card {
+  width: 100%;
+  height: auto;
+}
+
+.cardDetail .card__translater {
+  aspect-ratio: 2.5 / 3.5;
+  width: 100%;
 }
 
 /* カード詳細内のカードは通常のインタラクティブカード */
@@ -2431,15 +2447,107 @@ body::before{
 @media (max-width: 600px) {
   .cardDetailModal .modal__panel--card {
     width: 95vw;
-    padding: 50px 15px 15px;
-  }
-  
-  .cardDetail {
-    max-width: 300px;
+    max-width: 500px;
+    padding: 60px 20px 20px;
+    max-height: 95vh;
+    overflow-y: auto;
   }
   
   .cardDetailContainer {
     padding: 10px;
-    min-height: 350px;
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .cardDetail {
+    width: 90vw;
+    max-width: 280px;
+  }
+  
+  /* スマホでカードのアスペクト比を維持 */
+  .cardDetail .card__translater {
+    aspect-ratio: 2.5 / 3.5;
+    width: 100%;
+  }
+  
+  .cardDetail .card__rotator {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .cardDetail .card__meta {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+}
+
+/* 非常に小さい画面用（iPhone SE等） */
+@media (max-width: 400px) {
+  .cardDetailModal .modal__panel--card {
+    width: 98vw;
+    padding: 55px 10px 15px;
+  }
+  
+  .cardDetail {
+    width: 85vw;
+    max-width: 240px;
+  }
+  
+  .cardDetailContainer {
+    padding: 5px;
+  }
+  
+  .closeDetailBtn {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+    top: 10px;
+    right: 10px;
+  }
+}
+
+
+/* 横向きモード（ランドスケープ）対応 */
+@media (max-height: 600px) and (orientation: landscape) {
+  .cardDetailModal .modal__panel--card {
+    max-height: 95vh;
+    padding: 50px 20px 15px;
+    width: min(400px, 80vw);
+  }
+  
+  .cardDetailContainer {
+    padding: 10px;
+    min-height: auto;
+  }
+  
+  .cardDetail {
+    max-width: 250px;
+  }
+  
+  .closeDetailBtn {
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
+  }
+}
+
+/* 小さい横向き画面 */
+@media (max-height: 500px) and (orientation: landscape) {
+  .cardDetailModal .modal__panel--card {
+    max-height: 98vh;
+    padding: 45px 15px 10px;
+    width: min(350px, 75vw);
+  }
+  
+  .cardDetail {
+    max-width: 200px;
+  }
+  
+  .cardDetail .card__meta {
+    font-size: 10px;
+    padding: 6px 8px;
   }
 }
