@@ -135,11 +135,17 @@ async function triggerGacha() {
   if (swipeHint) swipeHint.style.display = "none";
 
   // 銃動画を表示して再生
-  gunContainer.hidden = false;
+  gunContainer.classList.remove("isHidden");
   gunVideo.currentTime = 0;
   
+  // 少し待ってから再生（DOMの更新を待つ）
+  await wait(50);
+  
   try {
-    await gunVideo.play();
+    const playPromise = gunVideo.play();
+    if (playPromise !== undefined) {
+      await playPromise;
+    }
   } catch (e) {
     console.log("play blocked:", e);
     // 再生できない場合は直接カード表示へ
@@ -178,7 +184,7 @@ function resetToIntro() {
   introEl.classList.remove("fadeout");
 
   // 銃動画を隠して巻き戻し
-  gunContainer.hidden = true;
+  gunContainer.classList.add("isHidden");
   gunVideo.pause();
   gunVideo.currentTime = 0;
 
