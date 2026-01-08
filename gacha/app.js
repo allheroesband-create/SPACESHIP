@@ -862,3 +862,4 @@ window.showCard = () => {
   console.log("🎴 Manual card trigger");
   onGunVideoEnded();
 };
+
