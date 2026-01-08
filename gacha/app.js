@@ -199,8 +199,8 @@ async function onGunVideoEnded() {
     locked = false;
   }, 560);
 }
-
-gunVideo?.addEventListener("ended", onGunVideoEnded);
+// この行を削除（もう不要）
+// gunVideo?.addEventListener("ended", onGunVideoEnded);
 
 /* -----------------------------
    5) もう一度引く：開始画面へ戻す
@@ -405,4 +405,5 @@ function attachHoloPointer(cardRoot) {
     reset();
   });
 }
+
 
