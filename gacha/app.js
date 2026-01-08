@@ -511,24 +511,17 @@ function closeCardDetail() {
    ホロカード（レアリティ別エフェクト）- 静的バージョン
 ----------------------------- */
 
-// コレクション用: マウス位置を仮想的にアニメーション、3D回転なし
+// コレクション用: エフェクトなし、シンプルな画像表示
 function renderCardStatic(card) {
   const wrap = document.createElement("div");
-  wrap.className = "card card--static";
-  
-  const effectRarity = RARITY_EFFECT_MAP[card.rarity] || "common";
-  wrap.setAttribute("data-rarity", effectRarity);
+  wrap.className = "card card--static card--no-effect";
   wrap.setAttribute("data-card-id", card.id);
-  
-  console.log(`🎴 Collection card rarity: ${card.rarity} → Effect: ${effectRarity} (static)`);
   
   wrap.innerHTML = `
     <div class="card__translater">
       <div class="card__rotator card__rotator--static">
         <div class="card__front">
-          <div class="card__shine"></div>
-          <div class="card__glare"></div>
-          <img class="card__image card__image--overlay" src="${card.image}" alt="${escapeHtml(card.name)}" />
+          <img class="card__image" src="${card.image}" alt="${escapeHtml(card.name)}" />
           <div class="card__meta">
             <span class="card__name">${escapeHtml(card.name)}</span>
             <span class="card__rarity">${escapeHtml(card.rarity)}</span>
@@ -538,71 +531,7 @@ function renderCardStatic(card) {
     </div>
   `;
   
-  // 仮想マウス位置のアニメーションを適用
-  attachVirtualPointer(wrap);
-  
   return wrap;
-}
-
-/* -----------------------------
-   仮想ポインター（コレクション用）
------------------------------ */
-function attachVirtualPointer(cardRoot) {
-  let animationId = null;
-  let time = Math.random() * 1000; // ランダムな開始時間でずらす
-  
-  function animate() {
-    time += 0.016; // 約60fps
-    
-    // 円形の動きでマウス位置を仮想的にアニメーション
-    const speed = 0.3; // 動きの速度
-    const px = 0.5 + Math.sin(time * speed) * 0.3; // 0.2 ~ 0.8の範囲
-    const py = 0.5 + Math.cos(time * speed * 0.7) * 0.3; // 0.2 ~ 0.8の範囲
-    
-    const centerX = px - 0.5;
-    const centerY = py - 0.5;
-    const distanceFromCenter = Math.sqrt(centerX * centerX + centerY * centerY) * 1.414;
-
-    // CSS変数を設定（3D回転は除く）
-    cardRoot.style.setProperty("--pointer-x", `${px * 100}%`);
-    cardRoot.style.setProperty("--pointer-y", `${py * 100}%`);
-    cardRoot.style.setProperty("--pointer-from-left", px);
-    cardRoot.style.setProperty("--pointer-from-top", py);
-    cardRoot.style.setProperty("--pointer-from-center", distanceFromCenter);
-    
-    cardRoot.style.setProperty("--background-x", `${px * 100}%`);
-    cardRoot.style.setProperty("--background-y", `${py * 100}%`);
-    
-    cardRoot.style.setProperty("--card-opacity", "1");
-    
-    // posx, posyも設定（glareエフェクト用）
-    cardRoot.style.setProperty("--posx", `${px * 100}%`);
-    cardRoot.style.setProperty("--posy", `${py * 100}%`);
-    cardRoot.style.setProperty("--mx", `${px * 100}%`);
-    cardRoot.style.setProperty("--my", `${py * 100}%`);
-    
-    animationId = requestAnimationFrame(animate);
-  }
-  
-  // アニメーション開始
-  animate();
-  
-  // カードが削除される時にアニメーションを停止
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.removedNodes.forEach((node) => {
-        if (node === cardRoot || node.contains(cardRoot)) {
-          if (animationId) {
-            cancelAnimationFrame(animationId);
-          }
-        }
-      });
-    });
-  });
-  
-  if (cardRoot.parentElement) {
-    observer.observe(cardRoot.parentElement, { childList: true });
-  }
 }
 
 function openCollection() {
@@ -862,4 +791,3 @@ window.showCard = () => {
   console.log("🎴 Manual card trigger");
   onGunVideoEnded();
 };
-
