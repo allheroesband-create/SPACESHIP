@@ -32,7 +32,8 @@ export const CARDS = [
     id: "mark_zuckerberg",
     name: "MARK ZUCKERBERG",
     rarity: "Lieutenant Colonel",
-    image: "./assets/Mark_Zuckerberg.png"
+    image: "./assets/Mark_Zuckerberg.png",
+    overlayImage: "./assets/Mark_Zuckerberg_overlay.png"
   },
   {
     id: "power_of_friendship",
@@ -51,6 +52,8 @@ export const CARDS = [
     id: "peter_thiel",
     name: "PETER THIEL",
     rarity: "Colonel",
-    image: "./assets/Peter_Thiel2.png"
+    image: "./assets/Peter_Thiel2.png",
+    overlayImage: "./assets/Peter_Thiel_overlay.png"
   }
 ];
+
