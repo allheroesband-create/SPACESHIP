@@ -1595,7 +1595,7 @@ body::before{
 }
 
 /* ===============================================
-   SHINY VMAX (COLONEL) - VMAXテクスチャ
+   SHINY VMAX (COLONEL) - VMAXテクスチャ（縮小・パターン化）
    =============================================== */
 
 .card[data-rarity="rare shiny vmax"] .card__shine {
@@ -1617,19 +1617,20 @@ body::before{
     );
 
   background-size: 
-    180% 180%,
+    25% 25%,
     var(--glittersize) var(--glittersize), 
     var(--glittersize) var(--glittersize), 
     400% 400%, 
     cover;
     
   background-position: 
-    calc(var(--background-x) * 2) calc(var(--background-y) * 2),
+    calc(50% + (var(--background-x) - 50%) * 0.3) calc(50% + (var(--background-y) - 50%) * 0.3),
     40% 45%, 
     55% 55%, 
     calc( var(--background-x) * 1.5) calc( var(--background-y) * 1.5 ), 
     center center;
     
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
   background-blend-mode: overlay, soft-light, overlay, color-burn;
   filter: brightness(1.1) contrast(1.1) saturate(.95);
 }
@@ -1656,7 +1657,7 @@ body::before{
 }
 
 /* ===============================================
-   V-STAR (LIEUTENANT COLONEL) - ウェーブテクスチャ
+   V-STAR (LIEUTENANT COLONEL) - ウェーブテクスチャ（縮小・パターン化）
    =============================================== */
 
 .card[data-rarity="rare holo vstar"] .card__shine {
@@ -1690,17 +1691,18 @@ body::before{
 
   background-blend-mode: overlay, soft-light, hue, hard-light;
   background-size: 
-    140% 140%,
+    20% 20%,
     200% 700%, 
     300% 100%, 
     200% 100%;
     
   background-position: 
-    calc(var(--background-x) * 2.5) calc(var(--background-y) * 2.5),
+    calc(50% + (var(--background-x) - 50%) * 0.4) calc(50% + (var(--background-y) - 50%) * 0.4),
     0% var(--background-y), 
     var(--background-x) var(--background-y), 
     var(--background-x) var(--background-y);
   
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
   filter: brightness(calc((var(--pointer-from-center) * .85) + .35)) contrast(2.2) saturate(1.4);
 }
 
@@ -1734,17 +1736,18 @@ body::before{
     );
 
   background-size: 
-    120% 120%,
+    30% 30%,
     200% 400%, 
     195% 100%, 
     200% 100%;
     
   background-position: 
-    calc(var(--background-x) * -1.5) calc(var(--background-y) * -1.5),
+    calc(50% - (var(--background-x) - 50%) * 0.5) calc(50% - (var(--background-y) - 50%) * 0.5),
     0% var(--background-y), 
     calc( var(--background-x) * -1) calc( var(--background-y) * -1), 
     var(--background-x) var(--background-y);
 
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
   filter: brightness(calc((var(--pointer-from-center) * .85) + .6)) contrast(1.7) saturate(1.7);
   mix-blend-mode: exclusion;
 }
@@ -1807,4 +1810,70 @@ body::before{
 .card.active[data-rarity="rare holo vstar"] {
   transform: scale(1.02);
   transition: transform 0.3s ease-out;
+}
+
+
+/* ===============================================
+   文字部分の保護マスク
+   =============================================== */
+
+/* Colonel と Lieutenant Colonel のカードにマスクを適用 */
+.card[data-rarity="rare shiny vmax"] .card__shine,
+.card[data-rarity="rare shiny vmax"] .card__shine:before,
+.card[data-rarity="rare shiny vmax"] .card__shine:after,
+.card[data-rarity="rare holo vstar"] .card__shine,
+.card[data-rarity="rare holo vstar"] .card__shine:before,
+.card[data-rarity="rare holo vstar"] .card__shine:after {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 60%,
+    rgba(0, 0, 0, 0.7) 70%,
+    rgba(0, 0, 0, 0.3) 80%,
+    rgba(0, 0, 0, 0.1) 90%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 60%,
+    rgba(0, 0, 0, 0.7) 70%,
+    rgba(0, 0, 0, 0.3) 80%,
+    rgba(0, 0, 0, 0.1) 90%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* グレアにも同じマスクを適用 */
+.card[data-rarity="rare shiny vmax"] .card__glare,
+.card[data-rarity="rare shiny vmax"] .card__glare:after,
+.card[data-rarity="rare holo vstar"] .card__glare,
+.card[data-rarity="rare holo vstar"] .card__glare:after {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 60%,
+    rgba(0, 0, 0, 0.7) 70%,
+    rgba(0, 0, 0, 0.3) 80%,
+    rgba(0, 0, 0, 0.1) 90%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 1) 60%,
+    rgba(0, 0, 0, 0.7) 70%,
+    rgba(0, 0, 0, 0.3) 80%,
+    rgba(0, 0, 0, 0.1) 90%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* カード画像自体は完全に表示 */
+.card[data-rarity="rare shiny vmax"] .card__image,
+.card[data-rarity="rare holo vstar"] .card__image {
+  position: relative;
+  z-index: 1;
+  -webkit-mask-image: none;
+  mask-image: none;
 }
