@@ -2184,22 +2184,34 @@ body::before{
   height: 100%;
 }
 
-.collectItem .card__image {
+/* コレクション内: エフェクトレイヤーを画像の下に配置 */
+.collectItem .card__shine,
+.collectItem .card__glare {
+  z-index: 1;  /* エフェクトを下に */
+}
+
+.collectItem .card__image--overlay {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  z-index: 2;  /* 画像を上に */
+  pointer-events: none;  /* クリックイベントを透過 */
 }
 
 /* コレクション内のカードメタデータ位置調整 */
 .collectItem .card__meta {
-  display: block !important;  /* コレクション内では表示 */
+  display: block !important;
   font-size: 11px;
   padding: 6px 8px;
+  z-index: 3;  /* メタデータを最上位に */
+  position: relative;
 }
 
-/* 静的カード: ポインター追跡エフェクトを無効化 */
+/* 静的カード: 仮想ポインター追跡用の初期値 */
 .card--static {
-  /* デフォルトのCSS変数値を設定（中央固定） */
+  /* CSS変数は仮想ポインターアニメーションで動的に更新される */
   --pointer-x: 50%;
   --pointer-y: 50%;
   --pointer-from-left: 0.5;
@@ -2208,48 +2220,52 @@ body::before{
   --background-x: 50%;
   --background-y: 50%;
   --card-opacity: 1;
+  --posx: 50%;
+  --posy: 50%;
+  --mx: 50%;
+  --my: 50%;
 }
 
 /* 静的カードのrotatorは回転しない */
 .card__rotator--static {
-  --rx: 0deg;
-  --ry: 0deg;
-  --o: 0.3;  /* 常に少しだけエフェクトを表示 */
+  --rx: 0deg !important;  /* 3D回転を完全に無効化 */
+  --ry: 0deg !important;
+  --o: 0.8;  /* エフェクトの基本不透明度 */
+  transform: none !important;  /* 3D変形を無効化 */
 }
 
-/* 静的カードではactiveクラスの効果を無効化 */
+/* 静的カードではactiveクラスの効果を調整 */
 .card--static.active .card__shine {
-  /* activeクラスがついても、アニメーションのみ有効 */
   animation: glitterShimmer 4s ease-in-out infinite;
 }
 
-/* 静的カードではホバー時の3D変形を無効化 */
+/* 静的カードのホバー時は回転させない */
 .collectItem .card--static:hover {
   transform: none;
-  filter: none;
 }
 
-/* コレクション内のカードのホロエフェクト強度を固定 */
+/* コレクション内のカードのホロエフェクト強度 */
 .card--static .card__shine {
-  /* アニメーションは有効だが、ポインター追跡は無効 */
-  opacity: 0.7;  /* 固定の不透明度 */
+  opacity: 0.85;  /* 仮想ポインターで動くので少し強めに */
 }
 
 .card--static .card__glare {
-  /* グレアも固定表示 */
-  opacity: 0.4;  /* 控えめなグレア */
+  opacity: 0.6;  /* グレアも少し強めに */
 }
 
-/* コレクション内のカードはtouch-action: autoでスクロール可能 */
-.collectItem .card__rotator--static {
-  touch-action: auto;
-  pointer-events: none;  /* ポインターイベントを無効化 */
-}
-
-/* コレクションアイテム全体はクリック可能に */
+/* コレクションアイテム全体はクリック可能 */
 .collectItem {
-  cursor: default;
+  cursor: pointer;
   touch-action: auto;
+  transition: transform 0.2s ease;
+}
+
+.collectItem:hover {
+  transform: scale(1.05);
+}
+
+.collectItem:active {
+  transform: scale(0.98);
 }
 
 
@@ -2292,44 +2308,177 @@ body::before{
 
 
 /* ===============================================
-   静的カード（コレクション用）の固定エフェクト
+   静的カード（コレクション用）の動的エフェクト
    =============================================== */
 
-/* 静的カードのshineレイヤーは中央固定で表示 */
+/* 静的カードのshineレイヤーは仮想ポインターで動的に変化 */
 .card--static[data-rarity="rare secret"] .card__shine,
 .card--static[data-rarity="rare shiny vmax"] .card__shine,
 .card--static[data-rarity="rare holo vstar"] .card__shine {
-  /* CSS変数が中央固定なので、エフェクトも中央で固定表示 */
-  opacity: 0.8;
+  /* 仮想ポインターによりCSS変数が動的に変化するため、エフェクトも動く */
+  opacity: 0.9;
 }
 
 .card--static[data-rarity="rare secret"] .card__shine:before,
 .card--static[data-rarity="rare shiny vmax"] .card__shine:before,
 .card--static[data-rarity="rare holo vstar"] .card__shine:before {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .card--static[data-rarity="rare secret"] .card__shine:after,
 .card--static[data-rarity="rare shiny vmax"] .card__shine:after,
 .card--static[data-rarity="rare holo vstar"] .card__shine:after {
-  opacity: 0.5;
+  opacity: 0.7;
 }
 
-/* 静的カードのglareは控えめに */
+/* 静的カードのglareも仮想ポインターで動く */
 .card--static .card__glare {
-  opacity: 0.3;
-  filter: brightness(1) contrast(1);
+  opacity: calc(0.5 + (var(--pointer-from-center) * 0.3));  /* 動的な不透明度 */
+  filter: brightness(1.1) contrast(1.2);
 }
 
 .card--static .card__glare:after {
-  opacity: 0.2;
+  opacity: calc(0.3 + (var(--pointer-from-center) * 0.2));
 }
 
-/* 静的カードは3D変形しない */
+/* 静的カードは3D変形しない（重要） */
 .card--static .card__translater {
   transform: none !important;
 }
 
 .card--static .card__rotator {
   transform: none !important;
+}
+
+/* 仮想ポインターによるエフェクトは有効 */
+.card--static .card__shine,
+.card--static .card__glare {
+  /* background-positionなどはCSS変数で制御されるため、自動的に動く */
+  transition: opacity 0.1s ease;
+}
+
+
+/* ===============================================
+   カード詳細モーダル
+   =============================================== */
+
+.cardDetailModal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cardDetailModal.active {
+  opacity: 1;
+}
+
+.cardDetailModal .modal__backdrop {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.cardDetailModal .modal__panel--card {
+  position: relative;
+  width: min(500px, 90vw);
+  max-height: 90vh;
+  padding: 40px 20px 20px;
+  background: rgba(15, 15, 20, 0.95);
+  border: 2px solid rgba(255, 215, 120, 0.3);
+  border-radius: 24px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.8),
+    0 0 100px rgba(255, 215, 120, 0.1);
+  animation: cardDetailFadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cardDetailFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.closeDetailBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 300;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+  line-height: 1;
+  padding: 0;
+}
+
+.closeDetailBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(90deg);
+}
+
+.closeDetailBtn:active {
+  transform: rotate(90deg) scale(0.9);
+}
+
+.cardDetailContainer {
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  min-height: 400px;
+}
+
+.cardDetail {
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+/* カード詳細内のカードは通常のインタラクティブカード */
+.cardDetail .card__image {
+  z-index: 1;  /* エフェクトの下 */
+}
+
+.cardDetail .card__shine,
+.cardDetail .card__glare {
+  z-index: 2;  /* エフェクトを上に */
+}
+
+.cardDetail .card__meta {
+  z-index: 3;  /* メタデータを最上位に */
+  display: block !important;
+  font-size: 13px;
+  padding: 10px 12px;
+}
+
+/* モバイル対応 */
+@media (max-width: 600px) {
+  .cardDetailModal .modal__panel--card {
+    width: 95vw;
+    padding: 50px 15px 15px;
+  }
+  
+  .cardDetail {
+    max-width: 300px;
+  }
+  
+  .cardDetailContainer {
+    padding: 10px;
+    min-height: 350px;
+  }
 }
