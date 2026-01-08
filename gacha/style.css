@@ -99,11 +99,10 @@ body::before{
   transform: translate(-50%, -50%);
   
   width: min(420px, 85vw);
-  opacity: 0;
   animation: gunFadeIn 0.3s ease-out forwards;
 }
 
-.gunContainer[hidden] {
+.gunContainer.isHidden {
   display: none !important;
 }
 
