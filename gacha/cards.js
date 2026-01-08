@@ -39,7 +39,7 @@ export const CARDS = [
   {
     id: "power_of_friendship",
     name: "THE POWER OF FRIENDSHIP",
-    rarity: "Colonel",
+    rarity: "Lieutenant Colonel",
     image: "./assets/The_Power_of_Friendship.png",
     overlayImage: "./assets/The_Power_of_Friendship_2.png"
   },
@@ -71,6 +71,7 @@ export const CARDS = [
     overlayImage: "./assets/EDWARD_SNOWDEN_overlay.png"
   },
 ];
+
 
 
 
