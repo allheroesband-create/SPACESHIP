@@ -1842,3 +1842,126 @@ body::before{
     cover;
 }
 */
+
+
+/* ===============================================
+   テキストオーバーレイレイヤー
+   =============================================== */
+
+.card__text-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 10;  /* shineとglareの上に配置 */
+  
+  /* エフェクトの影響を受けないように */
+  mix-blend-mode: normal;
+  
+  /* 軽いドロップシャドウで立体感を追加（オプション） */
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* テキストオーバーレイはホロエフェクトの上に表示されるべきなので、
+   z-indexを適切に設定 */
+
+.card__front {
+  position: relative;
+}
+
+.card__image {
+  position: relative;
+  z-index: 1;
+}
+
+.card__shine {
+  z-index: 2;
+}
+
+.card__glare {
+  z-index: 3;
+}
+
+.card__text-overlay {
+  z-index: 10;  /* 全てのエフェクトの上 */
+}
+
+.card__meta {
+  z-index: 11;  /* テキストオーバーレイの上 */
+}
+
+/* テキストオーバーレイにもマウス追従効果を適用したい場合（オプション） */
+.card.active .card__text-overlay {
+  /* 必要に応じてエフェクトを追加 */
+}
+
+
+/* ===============================================
+   オーバーレイ画像レイヤー
+   エフェクトの上に表示される追加画像
+   =============================================== */
+
+.card__overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 10;  /* shineとglareより上に配置 */
+  transform: translateZ(30px);  /* 3D空間で前面に */
+  
+  /* オーバーレイ画像も3D回転に追従 */
+  transform-style: preserve-3d;
+}
+
+/* カードのレイヤー順序の明確化 */
+.card__front {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.card__image {
+  position: relative;
+  z-index: 1;  /* 基本画像 */
+  transform: translateZ(0px);
+}
+
+.card__shine {
+  position: absolute;
+  inset: 0;
+  z-index: 5;  /* エフェクトレイヤー1 */
+  transform: translateZ(10px);
+}
+
+.card__glare {
+  position: absolute;
+  inset: 0;
+  z-index: 6;  /* エフェクトレイヤー2 */
+  transform: translateZ(15px);
+}
+
+.card__overlay {
+  /* 上記で定義済み */
+  z-index: 10;  /* オーバーレイ画像（最前面） */
+  transform: translateZ(30px);
+}
+
+.card__meta {
+  position: relative;
+  z-index: 11;  /* メタ情報（一番上） */
+  transform: translateZ(40px);
+}
+
+/* オーバーレイ画像にもホロエフェクトの動きを適用 */
+.card.active .card__overlay {
+  transition: transform 0.1s ease-out;
+}
+
+/* オーバーレイ画像が3D回転に自然に追従するようにする */
+.card__rotator:hover .card__overlay {
+  transform: translateZ(30px);
+}
