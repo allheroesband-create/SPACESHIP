@@ -22,6 +22,12 @@ export const CARDS = [
   },
   {
     id: "mark_zuckerberg",
+    name: "ERICA KIRK",
+    rarity: "Lieutenant Colonel",
+    image: "./assets/Erica_Kirk.png"
+  },
+  {
+    id: "mark_zuckerberg",
     name: "MARK ZUCKERBERG",
     rarity: "Lieutenant Colonel",
     image: "./assets/Mark_Zuckerberg.png"
@@ -46,3 +52,4 @@ export const CARDS = [
     image: "./assets/Peter_Thiel2.png"
   }
 ];
+
