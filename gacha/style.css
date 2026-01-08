@@ -90,39 +90,36 @@ body::before{
   to{ opacity: 0; filter: blur(2px); transform: scale(1.01); }
 }
 
-/* ---- Gun video ---- */
-.gun{
+/* ---- Gun video container ---- */
+.gunContainer {
   position: absolute;
-  z-index: 3;
-  bottom: 8vh;
+  z-index: 20;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
-
-  border: 0;
-  padding: 0;
-  background: transparent;
-  cursor: pointer;
-
-  width: min(380px, 78vw);
-  transition: none;
+  transform: translate(-50%, -50%);
+  
+  width: min(420px, 85vw);
+  opacity: 0;
+  animation: gunFadeIn 0.3s ease-out forwards;
 }
 
-.gunVideo{
+.gunContainer[hidden] {
+  display: none !important;
+}
+
+@keyframes gunFadeIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.gunVideo {
   width: 100%;
   height: auto;
   display: block;
   border-radius: 18px;
-  box-shadow: 0px 18px 40px -18px rgba(0,0,0,0.85);
-}
-
-.gun.idle{
-  animation: none;
-  filter: drop-shadow(0 0 14px rgba(255,210,120,0.18));
-}
-
-.gun.playing{
-  transform: translateX(-50%);
-  filter: drop-shadow(0 0 18px rgba(255,210,120,0.25));
+  box-shadow: 
+    0px 18px 40px -18px rgba(0,0,0,0.85),
+    0 0 60px rgba(255, 200, 100, 0.3);
 }
 
 /* ---- ガチャを引くボタン ---- */
