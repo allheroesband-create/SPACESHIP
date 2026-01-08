@@ -98,8 +98,16 @@ function initGunVideo() {
   
   gunVideo.addEventListener("loadedmetadata", () => {
     console.log("📊 Video: loadedmetadata");
-    console.log("  Duration:", gunVideo.duration);
+    console.log("  Duration:", gunVideo.duration, "seconds");
     console.log("  Video dimensions:", gunVideo.videoWidth, "x", gunVideo.videoHeight);
+    
+    // 動画が短すぎる、または長すぎる場合の警告
+    if (gunVideo.duration < 0.5) {
+      console.warn("⚠️ Video is very short (<0.5s). Ended event might not fire reliably.");
+    }
+    if (gunVideo.duration > 30) {
+      console.warn("⚠️ Video is very long (>30s). Consider using a shorter video.");
+    }
   });
   
   gunVideo.addEventListener("loadeddata", () => {
@@ -299,25 +307,44 @@ async function triggerGacha() {
 async function onGunVideoEnded() {
   console.log("🎬 === VIDEO ENDED / TRANSITIONING TO CARD ===");
   
-  console.log("Step 1: Fade out intro");
+  console.log("Step 1: Hide gun container");
+  gunContainer.classList.add("isHidden");
+  
+  console.log("Step 2: Fade out intro");
   introEl.classList.add("fadeout");
 
   await wait(120);
   
-  console.log("Step 2: Reveal card with flip");
+  console.log("Step 3: Reveal card with flip");
   revealPullWithFlip();
 
   setTimeout(() => {
-    console.log("Step 3: Hide intro completely");
+    console.log("Step 4: Hide intro completely");
     introEl.style.display = "none";
     
-    console.log("Step 4: Unlock gacha");
+    console.log("Step 5: Unlock gacha");
     locked = false;
     console.log("🔓 Gacha unlocked");
   }, 560);
 }
 
-gunVideo?.addEventListener("ended", onGunVideoEnded);
+// 動画終了イベントを確実に検出
+if (gunVideo) {
+  gunVideo.addEventListener("ended", () => {
+    console.log("🎬 Video 'ended' event fired!");
+    onGunVideoEnded();
+  });
+  
+  // 予備: 動画の時間をチェック（endedイベントが発火しない場合の対策）
+  gunVideo.addEventListener("timeupdate", () => {
+    if (gunVideo.currentTime >= gunVideo.duration - 0.1 && !gunVideo.paused) {
+      console.log("⚠️ Video almost finished (timeupdate fallback)");
+      // endedイベントの代わりに発火させる
+      gunVideo.pause();
+      onGunVideoEnded();
+    }
+  });
+}
 
 /* -----------------------------
    5) もう一度引く
@@ -526,3 +553,18 @@ function attachHoloPointer(cardRoot) {
 console.log("✅ === APP INITIALIZED ===");
 console.log("📦 Total cards available:", CARDS.length);
 console.log("🎬 Ready to gacha!");
+console.log("");
+console.log("💡 Debug tips:");
+console.log("- Type 'showCard()' in console to manually show a card");
+console.log("- Type 'resetIntro()' in console to reset to intro screen");
+
+// デバッグ用のグローバル関数
+window.showCard = () => {
+  console.log("🎴 Manual card trigger");
+  onGunVideoEnded();
+};
+
+window.resetIntro = () => {
+  console.log("🔄 Manual reset trigger");
+  resetToIntro();
+};
