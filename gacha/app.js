@@ -416,8 +416,8 @@ function renderCollection() {
     const el = document.createElement("div");
     el.className = "collectItem";
     
-    // カードをホロエフェクト付きで表示
-    const cardNode = renderCard(card);
+    // カードをホロエフェクト付きで表示（ただしポインター追跡は無効）
+    const cardNode = renderCardStatic(card);  // 静的バージョンを使用
     cardNode.classList.add("collectCard");
     
     const metaNode = document.createElement("div");
@@ -434,6 +434,41 @@ function renderCollection() {
     el.appendChild(metaNode);
     collectionGrid.appendChild(el);
   }
+}
+
+/* -----------------------------
+   ホロカード（レアリティ別エフェクト）- 静的バージョン
+----------------------------- */
+
+// コレクション用: マウス/タッチ追跡なし、アニメーションのみ
+function renderCardStatic(card) {
+  const wrap = document.createElement("div");
+  wrap.className = "card card--static";  // 静的カード用のクラスを追加
+  
+  // レアリティに応じたエフェクトを設定
+  const effectRarity = RARITY_EFFECT_MAP[card.rarity] || "common";
+  wrap.setAttribute("data-rarity", effectRarity);
+  
+  console.log(`🎴 Collection card rarity: ${card.rarity} → Effect: ${effectRarity} (static)`);
+  
+  wrap.innerHTML = `
+    <div class="card__translater">
+      <div class="card__rotator card__rotator--static">
+        <div class="card__front">
+          <img class="card__image" src="${card.image}" alt="${escapeHtml(card.name)}" />
+          <div class="card__shine"></div>
+          <div class="card__glare"></div>
+          <div class="card__meta">
+            <span class="card__name">${escapeHtml(card.name)}</span>
+            <span class="card__rarity">${escapeHtml(card.rarity)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // attachHoloPointer は呼び出さない（ポインター追跡なし）
+  return wrap;
 }
 
 function openCollection() {
