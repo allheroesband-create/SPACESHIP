@@ -1496,14 +1496,21 @@ body::before{
 }
 
 /* ===============================================
-   SECRET RARE (SPECIAL) - ギャラクシーテクスチャ
+   SECRET RARE (SPECIAL) - ギャラクシーテクスチャ（グリッター強化版）
    =============================================== */
+
+/* Secret Rare専用の強化グリッター */
+.card[data-rarity="rare secret"] {
+  --glittersize-secret: 15px;  /* より小さく密集したグリッター */
+  --glitter-secret: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"><circle cx="2" cy="2" r="1.2" fill="white" opacity="0.95"/><circle cx="7" cy="5" r="0.8" fill="white" opacity="0.85"/><circle cx="12" cy="9" r="1" fill="white" opacity="0.9"/><circle cx="4" cy="11" r="0.7" fill="white" opacity="0.8"/><circle cx="10" cy="13" r="0.9" fill="white" opacity="0.85"/><circle cx="13" cy="3" r="0.6" fill="gold" opacity="0.7"/></svg>');
+}
 
 .card[data-rarity="rare secret"] .card__shine {
   background-image:
     var(--texture-galaxy),
-    var(--glitter), 
-    var(--glitter), 
+    var(--glitter-secret),
+    var(--glitter-secret), 
+    var(--glitter-secret),  /* 3層のグリッター */
     conic-gradient( 
       var(--sunpillar-clr-4), 
       var(--sunpillar-clr-5),
@@ -1513,49 +1520,94 @@ body::before{
     ), 
     radial-gradient( 
       farthest-corner circle at var(--pointer-x) var(--pointer-y), 
-      hsla(150, 00%, 0%, .98) 10%, 
-      hsla(0, 0%, 95%, .15) 90% 
+      hsla(45, 100%, 85%, .35) 0%,    /* ゴールドの明るいハイライト */
+      hsla(45, 80%, 50%, .15) 30%, 
+      hsla(150, 0%, 20%, .95) 60%, 
+      hsla(0, 0%, 5%, .98) 100% 
     );
 
   background-size: 
     200% 200%, 
-    var(--glittersize) var(--glittersize), 
-    var(--glittersize) var(--glittersize), 
+    var(--glittersize-secret) var(--glittersize-secret),
+    var(--glittersize-secret) var(--glittersize-secret),
+    var(--glittersize-secret) var(--glittersize-secret),
     cover, 
     cover;
     
   background-position: 
     var(--background-x) var(--background-y),
-    45% 45%, 
-    55% 55%, 
+    42% 43%, 
+    58% 57%,
+    50% 50%, 
     center center, 
     center center;
     
-  background-blend-mode: overlay, soft-light, soft-light, overlay;
-  mix-blend-mode: screen;  /* color-dodgeから変更：より柔らかい光 */
-  filter: brightness(calc( 0.4 + (var(--pointer-from-center) * 0.2) )) contrast(1.1) saturate(1.5);  /* 明るさを抑制 */
+  background-blend-mode: screen, screen, hard-light, overlay, overlay;
+  mix-blend-mode: color-dodge;  /* 強い光のエフェクト */
+  filter: brightness(calc( 0.65 + (var(--pointer-from-center) * 0.35) )) contrast(1.3) saturate(2.2);
 }
 
 .card[data-rarity="rare secret"] .card__shine:before {
   background-image:
+    var(--glitter-secret),  /* 追加のグリッター層 */
     var(--texture-cosmos),
-    linear-gradient( 45deg, hsl(46, 95%, 50%), hsl(52, 100%, 69%) ), 
+    linear-gradient( 45deg, 
+      hsl(46, 100%, 60%), 
+      hsl(52, 100%, 75%),
+      hsl(46, 100%, 60%)
+    ), 
     radial-gradient( 
       farthest-corner circle at var(--pointer-x) var(--pointer-y), 
-      hsla(10, 20%, 90%, 0.95) 10%, 
-      hsl(0, 0%, 0%) 70% 
+      hsla(45, 90%, 95%, 0.95) 0%,   /* より明るいゴールド */
+      hsla(45, 70%, 70%, 0.6) 40%, 
+      hsl(0, 0%, 0%) 80% 
     );
 
-  background-size: 150% 150%, cover, cover;
+  background-size: 
+    var(--glittersize-secret) var(--glittersize-secret),
+    150% 150%, 
+    cover, 
+    cover;
+    
   background-position: 
+    46% 48%,
     calc(var(--background-x) * 1.5) calc(var(--background-y) * 1.5),
     center center, 
     center center;
-  background-blend-mode: overlay, soft-light, multiply;  /* hard-lightをsoft-lightに変更 */
+    
+  background-blend-mode: screen, overlay, hard-light, multiply;
 
   mix-blend-mode: lighten;
-  filter: brightness(1.0) contrast(1.1) saturate(0.6);  /* 明るさを大幅に抑制 */
-  opacity: .55;  /* 不透明度を下げて光を抑える */
+  filter: brightness(1.6) contrast(1.4) saturate(0.8);
+  opacity: .9;
+}
+
+/* Secret Rare専用の追加のキラキラレイヤー */
+.card[data-rarity="rare secret"] .card__shine:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  
+  background-image: 
+    var(--glitter-secret),
+    radial-gradient(
+      circle at var(--pointer-x) var(--pointer-y),
+      hsla(45, 100%, 90%, 0.6) 0%,
+      hsla(45, 80%, 70%, 0.3) 20%,
+      transparent 50%
+    );
+    
+  background-size: 
+    var(--glittersize-secret) var(--glittersize-secret),
+    150% 150%;
+    
+  background-position:
+    52% 54%,
+    var(--pointer-x) var(--pointer-y);
+    
+  mix-blend-mode: screen;
+  opacity: calc(0.7 + (var(--pointer-from-center) * 0.3));
+  filter: brightness(1.8);
 }
 
 /* ===============================================
@@ -1724,13 +1776,34 @@ body::before{
   background-image: 
     radial-gradient( 
       farthest-corner circle at var(--pointer-x) var(--pointer-y), 
-      hsla(45, 60%, 70%, 0.25) 0%,  /* 明度と不透明度を下げる */
-      hsla(45, 30%, 40%, 0.15) 30%, /* 明度と不透明度を下げる */
-      hsl(22, 15%, 12%) 180%
+      hsla(45, 100%, 92%, 0.7) 0%,      /* 非常に明るいゴールドハイライト */
+      hsla(45, 95%, 78%, 0.5) 15%,      /* ミディアムゴールド */
+      hsla(45, 70%, 60%, 0.35) 30%,     /* ディープゴールド */
+      hsla(40, 40%, 40%, 0.2) 50%,      /* 暗いゴールド */
+      hsl(22, 15%, 12%) 100%            /* 背景へフェード */
     );
-  filter: brightness(0.9) contrast(1.3);  /* 明るさを大幅に下げる */
-  mix-blend-mode: overlay;  /* hard-lightからoverlayに変更：より柔らかい */
-  opacity: 0.7;  /* 全体の不透明度を下げる */
+  filter: brightness(1.6) contrast(1.8);
+  mix-blend-mode: hard-light;  /* より強い光 */
+  opacity: 0.95;
+}
+
+/* Secret Rare専用の追加グレア層 */
+.card[data-rarity="rare secret"] .card__glare:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  
+  background-image: 
+    radial-gradient(
+      circle at var(--pointer-x) var(--pointer-y),
+      hsla(45, 100%, 95%, 0.8) 0%,
+      hsla(45, 90%, 80%, 0.4) 10%,
+      transparent 30%
+    );
+    
+  mix-blend-mode: screen;
+  opacity: calc(0.5 + (var(--pointer-from-center) * 0.4));
+  filter: blur(20px) brightness(2);
 }
 
 .card[data-rarity="rare shiny vmax"] .card__glare {
@@ -1934,14 +2007,14 @@ body::before{
   position: absolute;
   inset: 0;
   z-index: 5;  /* エフェクトレイヤー1 */
-  transform: translateZ(35px);
+  transform: translateZ(10px);
 }
 
 .card__glare {
   position: absolute;
   inset: 0;
   z-index: 6;  /* エフェクトレイヤー2 */
-  transform: translateZ(10px);
+  transform: translateZ(15px);
 }
 
 .card__overlay {
@@ -1967,3 +2040,54 @@ body::before{
 }
 
 
+/* ===============================================
+   SECRET RARE 専用の追加エフェクト
+   =============================================== */
+
+/* カードがアクティブな時のさらなる輝き強化 */
+.card.active[data-rarity="rare secret"] .card__shine {
+  filter: brightness(calc( 0.7 + (var(--pointer-from-center) * 0.4) )) contrast(1.4) saturate(2.5);
+  animation: secretGlow 2s ease-in-out infinite;
+}
+
+/* パルス効果 */
+@keyframes secretGlow {
+  0%, 100% {
+    filter: brightness(calc( 0.7 + (var(--pointer-from-center) * 0.4) )) contrast(1.4) saturate(2.5);
+  }
+  50% {
+    filter: brightness(calc( 0.75 + (var(--pointer-from-center) * 0.45) )) contrast(1.5) saturate(2.7);
+  }
+}
+
+/* グリッターのシマー効果 */
+.card[data-rarity="rare secret"] .card__shine {
+  animation: glitterShimmer 3s ease-in-out infinite;
+}
+
+@keyframes glitterShimmer {
+  0%, 100% {
+    background-position: 
+      var(--background-x) var(--background-y),
+      42% 43%, 
+      58% 57%,
+      50% 50%, 
+      center center, 
+      center center;
+  }
+  50% {
+    background-position: 
+      var(--background-x) var(--background-y),
+      43% 44%, 
+      57% 56%,
+      51% 51%, 
+      center center, 
+      center center;
+  }
+}
+
+/* ゴールドの輝き強調 */
+.card[data-rarity="rare secret"]:hover {
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6))
+          drop-shadow(0 0 40px rgba(255, 215, 0, 0.3));
+}
