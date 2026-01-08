@@ -12,6 +12,19 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
+    <!-- 銃動画（全画面・イントロの外に配置） -->
+    <div id="gunContainer" class="gunContainer isHidden">
+      <video
+        id="gunVideo"
+        class="gunVideo"
+        src="./assets/gun.mp4"
+        preload="auto"
+        playsinline
+        muted
+        webkit-playsinline
+      ></video>
+    </div>
+
     <main class="wrap">
 
       <!-- イントロ（開始画面） -->
@@ -19,19 +32,6 @@
         <div class="introText">
           <h1>USA the Freedom Colosseum</h1>
           <p class="sub">Card Game of America</p>
-        </div>
-
-        <!-- 銃動画（最初は非表示・全画面） -->
-        <div id="gunContainer" class="gunContainer isHidden">
-          <video
-            id="gunVideo"
-            class="gunVideo"
-            src="./assets/gun.mp4"
-            preload="auto"
-            playsinline
-            muted
-            webkit-playsinline
-          ></video>
         </div>
 
         <!-- ガチャを引くボタン -->
