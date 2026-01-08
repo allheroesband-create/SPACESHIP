@@ -21,7 +21,7 @@ export const CARDS = [
     image: "./assets/RIGHT_HAND.png"
   },
   {
-    id: "mark_zuckerberg",
+    id: "erica_kirk",
     name: "ERICA KIRK",
     rarity: "Lieutenant Colonel",
     image: "./assets/Erica_Kirk.png"
@@ -52,4 +52,5 @@ export const CARDS = [
     image: "./assets/Peter_Thiel2.png"
   }
 ];
+
 
