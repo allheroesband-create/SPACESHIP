@@ -415,16 +415,23 @@ function renderCollection() {
   for (const { card, count } of owned) {
     const el = document.createElement("div");
     el.className = "collectItem";
-    el.innerHTML = `
-      <img src="${card.image}" alt="${escapeHtml(card.name)}" />
-      <div class="collectMeta">
-        <div class="collectName">${escapeHtml(card.name)}</div>
-        <div class="collectRow">
-          <span>${escapeHtml(card.rarity)}</span>
-          <span>x${count}</span>
-        </div>
+    
+    // カードをホロエフェクト付きで表示
+    const cardNode = renderCard(card);
+    cardNode.classList.add("collectCard");
+    
+    const metaNode = document.createElement("div");
+    metaNode.className = "collectMeta";
+    metaNode.innerHTML = `
+      <div class="collectName">${escapeHtml(card.name)}</div>
+      <div class="collectRow">
+        <span>${escapeHtml(card.rarity)}</span>
+        <span>x${count}</span>
       </div>
     `;
+    
+    el.appendChild(cardNode);
+    el.appendChild(metaNode);
     collectionGrid.appendChild(el);
   }
 }
@@ -589,6 +596,38 @@ function attachHoloPointer(cardRoot) {
     rotator.style.setProperty("--ry", `${rx}deg`);
     rotator.style.setProperty("--o", `1`);
   }
+  
+  function setVarsFromTouch(touch) {
+    const rect = rotator.getBoundingClientRect();
+    const px = (touch.clientX - rect.left) / rect.width;
+    const py = (touch.clientY - rect.top) / rect.height;
+
+    const ry = (px - 0.5) * -18;
+    const rx = (py - 0.5) * 18;
+    
+    const centerX = px - 0.5;
+    const centerY = py - 0.5;
+    const distanceFromCenter = Math.sqrt(centerX * centerX + centerY * centerY) * 1.414;
+
+    cardRoot.style.setProperty("--pointer-x", `${px * 100}%`);
+    cardRoot.style.setProperty("--pointer-y", `${py * 100}%`);
+    cardRoot.style.setProperty("--pointer-from-left", px);
+    cardRoot.style.setProperty("--pointer-from-top", py);
+    cardRoot.style.setProperty("--pointer-from-center", distanceFromCenter);
+    
+    cardRoot.style.setProperty("--background-x", `${px * 100}%`);
+    cardRoot.style.setProperty("--background-y", `${py * 100}%`);
+    
+    cardRoot.style.setProperty("--card-opacity", "1");
+    
+    rotator.style.setProperty("--posx", `${px * 100}%`);
+    rotator.style.setProperty("--posy", `${py * 100}%`);
+    rotator.style.setProperty("--mx", `${px * 100}%`);
+    rotator.style.setProperty("--my", `${py * 100}%`);
+    rotator.style.setProperty("--rx", `${ry}deg`);
+    rotator.style.setProperty("--ry", `${rx}deg`);
+    rotator.style.setProperty("--o", `1`);
+  }
 
   function reset() {
     rotator.style.setProperty("--rx", `0deg`);
@@ -597,9 +636,46 @@ function attachHoloPointer(cardRoot) {
     cardRoot.style.setProperty("--card-opacity", "0.5");
   }
 
+  // デスクトップ: pointermove
   rotator.addEventListener("pointermove", setVarsFromEvent);
   rotator.addEventListener("pointerenter", () => cardRoot.classList.add("active"));
   rotator.addEventListener("pointerleave", () => {
+    cardRoot.classList.remove("active");
+    reset();
+  });
+  
+  // モバイル: touch events with scroll prevention
+  let isTouching = false;
+  
+  rotator.addEventListener("touchstart", (e) => {
+    isTouching = true;
+    cardRoot.classList.add("active");
+    const touch = e.touches[0];
+    setVarsFromTouch(touch);
+    
+    // カード上でのタッチ開始時、ページスクロールを防止
+    e.preventDefault();
+  }, { passive: false });
+  
+  rotator.addEventListener("touchmove", (e) => {
+    if (!isTouching) return;
+    
+    const touch = e.touches[0];
+    setVarsFromTouch(touch);
+    
+    // カード上での指の動きでページがスクロールしないようにする
+    e.preventDefault();
+    e.stopPropagation();
+  }, { passive: false });
+  
+  rotator.addEventListener("touchend", () => {
+    isTouching = false;
+    cardRoot.classList.remove("active");
+    reset();
+  });
+  
+  rotator.addEventListener("touchcancel", () => {
+    isTouching = false;
     cardRoot.classList.remove("active");
     reset();
   });
