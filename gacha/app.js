@@ -13,9 +13,10 @@ const SWIPE_THRESHOLD = 80; // スワイプと判定する最小距離(px)
 const SWIPE_TIME_LIMIT = 500; // スワイプの最大時間(ms)
 
 const introEl = $("#intro");
-const gunBtn = $("#gunBtn");
+const gunContainer = $("#gunContainer");
 const gunVideo = $("#gunVideo");
 const gachaBtn = $("#gachaBtn");
+const swipeHint = $(".swipeHint");
 
 const cardRevealEl = $("#cardReveal");
 const historyEl = $("#history");
@@ -56,28 +57,72 @@ function pickUniform(cards) {
 }
 
 /* -----------------------------
-   2) 銃：最初は停止フレーム
+   2) 銃：初期化
 ----------------------------- */
-function initGunStoppedFrame() {
+function initGunVideo() {
   if (!gunVideo) return;
   gunVideo.pause();
   gunVideo.currentTime = 0;
-
-  gunVideo.addEventListener(
-    "loadedmetadata",
-    () => {
-      gunVideo.currentTime = 0;
-      gunVideo.pause();
-    },
-    { once: true }
-  );
 }
-initGunStoppedFrame();
+initGunVideo();
 
 /* -----------------------------
-   3) タップ：銃動画再生（演出開始）
+   3) ガチャを引くボタン：銃動画再生→カード表示
 ----------------------------- */
-gunBtn?.addEventListener("click", async () => {
+gachaBtn?.addEventListener("click", async () => {
+  if (locked) return;
+  triggerGacha();
+});
+
+/* -----------------------------
+   3.6) スワイプでガチャを引く（スマホ用）
+----------------------------- */
+function handleTouchStart(e) {
+  touchStartY = e.touches[0].clientY;
+  touchStartX = e.touches[0].clientX;
+  touchStartTime = Date.now();
+}
+
+function handleTouchEnd(e) {
+  if (locked) return;
+  
+  const touchEndY = e.changedTouches[0].clientY;
+  const touchEndX = e.changedTouches[0].clientX;
+  const touchEndTime = Date.now();
+  
+  const deltaY = touchStartY - touchEndY;
+  const deltaX = Math.abs(touchStartX - touchEndX);
+  const deltaTime = touchEndTime - touchStartTime;
+  
+  // 上スワイプ判定: 上方向に十分な距離、横移動は少なく、時間内
+  if (deltaY > SWIPE_THRESHOLD && deltaX < SWIPE_THRESHOLD && deltaTime < SWIPE_TIME_LIMIT) {
+    e.preventDefault();
+    showSwipeFeedback();
+    triggerGacha();
+  }
+}
+
+// スワイプフィードバック表示
+function showSwipeFeedback() {
+  const feedback = document.createElement("div");
+  feedback.className = "swipeFeedback";
+  feedback.innerHTML = "🎰 GACHA!";
+  document.body.appendChild(feedback);
+  
+  setTimeout(() => {
+    feedback.classList.add("fadeOut");
+    setTimeout(() => feedback.remove(), 300);
+  }, 400);
+}
+
+// イントロ画面でのみスワイプ検出
+introEl?.addEventListener("touchstart", handleTouchStart, { passive: true });
+introEl?.addEventListener("touchend", handleTouchEnd, { passive: false });
+
+/* -----------------------------
+   ガチャ発動の共通処理
+----------------------------- */
+async function triggerGacha() {
   if (locked) return;
   locked = true;
 
@@ -85,43 +130,27 @@ gunBtn?.addEventListener("click", async () => {
   cardRevealEl.innerHTML = "";
   afterControlsEl.hidden = true;
 
+  // ガチャボタンとスワイプヒントを隠す
+  if (gachaBtn) gachaBtn.style.display = "none";
+  if (swipeHint) swipeHint.style.display = "none";
+
+  // 銃動画を表示して再生
+  gunContainer.hidden = false;
   gunVideo.currentTime = 0;
+  
   try {
     await gunVideo.play();
   } catch (e) {
     console.log("play blocked:", e);
-    locked = false;
+    // 再生できない場合は直接カード表示へ
+    onGunVideoEnded();
   }
-});
-
-/* -----------------------------
-   3.5) ガチャを引くボタン：即座にカード表示
------------------------------ */
-gachaBtn?.addEventListener("click", async () => {
-  if (locked) return;
-  locked = true;
-
-  // 前回のカードは消して、ボタンも隠す
-  cardRevealEl.innerHTML = "";
-  afterControlsEl.hidden = true;
-
-  // イントロをフェードアウト
-  introEl.classList.add("fadeout");
-
-  await wait(120);
-  revealPullWithFlip();
-
-  // イントロを隠す
-  setTimeout(() => {
-    introEl.style.display = "none";
-    locked = false;
-  }, 560);
-});
+}
 
 /* -----------------------------
    4) 動画終了：フェード→カード
 ----------------------------- */
-gunVideo?.addEventListener("ended", async () => {
+async function onGunVideoEnded() {
   introEl.classList.add("fadeout");
 
   await wait(120);
@@ -132,10 +161,12 @@ gunVideo?.addEventListener("ended", async () => {
     introEl.style.display = "none";
     locked = false;
   }, 560);
-});
+}
+
+gunVideo?.addEventListener("ended", onGunVideoEnded);
 
 /* -----------------------------
-   5) もう一度引く：B) 開始画面へ戻す
+   5) もう一度引く：開始画面へ戻す
 ----------------------------- */
 function resetToIntro() {
   // カードを消して、ボタンも消す
@@ -146,9 +177,14 @@ function resetToIntro() {
   introEl.style.display = "grid";
   introEl.classList.remove("fadeout");
 
-  // 銃動画停止＆巻き戻し
+  // 銃動画を隠して巻き戻し
+  gunContainer.hidden = true;
   gunVideo.pause();
   gunVideo.currentTime = 0;
+
+  // ガチャボタンとスワイプヒントを復活
+  if (gachaBtn) gachaBtn.style.display = "";
+  if (swipeHint) swipeHint.style.display = "";
 
   locked = false;
 }
