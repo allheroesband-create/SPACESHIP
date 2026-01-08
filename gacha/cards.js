@@ -30,7 +30,8 @@ export const CARDS = [
     id: "power_of_friendship",
     name: "THE POWER OF FRIENDSHIP",
     rarity: "Colonel",
-    image: "./assets/The_Power_of_Friendship.png"
+    image: "./assets/The_Power_of_Friendship.png",
+    overlayImage: "./assets/The_Power_of_Friendship_2.png"  // エフェクトの上に表示される画像
   },
   {
     id: "epstein",
