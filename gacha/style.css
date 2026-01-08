@@ -1496,7 +1496,7 @@ body::before{
 }
 
 /* ===============================================
-   SECRET RARE (SPECIAL) - ギャラクシーテクスチャ（グリッター強化版）
+   SECRET RARE (SPECIAL) - ギャラクシーテクスチャ（グリッター強化版・光度調整）
    =============================================== */
 
 /* Secret Rare専用の強化グリッター */
@@ -1520,9 +1520,9 @@ body::before{
     ), 
     radial-gradient( 
       farthest-corner circle at var(--pointer-x) var(--pointer-y), 
-      hsla(45, 100%, 85%, .35) 0%,    /* ゴールドの明るいハイライト */
-      hsla(45, 80%, 50%, .15) 30%, 
-      hsla(150, 0%, 20%, .95) 60%, 
+      hsla(45, 80%, 70%, .25) 0%,    /* 明るさを抑える */
+      hsla(45, 60%, 45%, .12) 30%, 
+      hsla(150, 0%, 20%, .92) 60%, 
       hsla(0, 0%, 5%, .98) 100% 
     );
 
@@ -1542,9 +1542,9 @@ body::before{
     center center, 
     center center;
     
-  background-blend-mode: screen, screen, hard-light, overlay, overlay;
-  mix-blend-mode: color-dodge;  /* 強い光のエフェクト */
-  filter: brightness(calc( 0.65 + (var(--pointer-from-center) * 0.35) )) contrast(1.3) saturate(2.2);
+  background-blend-mode: screen, screen, overlay, overlay, overlay;  /* hard-lightをoverlayに */
+  mix-blend-mode: screen;  /* color-dodgeをscreenに変更 - 柔らかい光 */
+  filter: brightness(calc( 0.55 + (var(--pointer-from-center) * 0.25) )) contrast(1.2) saturate(1.9);  /* 明るさとコントラストを抑える */
 }
 
 .card[data-rarity="rare secret"] .card__shine:before {
@@ -1552,14 +1552,14 @@ body::before{
     var(--glitter-secret),  /* 追加のグリッター層 */
     var(--texture-cosmos),
     linear-gradient( 45deg, 
-      hsl(46, 100%, 60%), 
-      hsl(52, 100%, 75%),
-      hsl(46, 100%, 60%)
+      hsl(46, 90%, 55%), 
+      hsl(52, 95%, 68%),
+      hsl(46, 90%, 55%)
     ), 
     radial-gradient( 
       farthest-corner circle at var(--pointer-x) var(--pointer-y), 
-      hsla(45, 90%, 95%, 0.95) 0%,   /* より明るいゴールド */
-      hsla(45, 70%, 70%, 0.6) 40%, 
+      hsla(45, 80%, 85%, 0.8) 0%,   /* 明るさを少し抑える */
+      hsla(45, 60%, 65%, 0.5) 40%, 
       hsl(0, 0%, 0%) 80% 
     );
 
@@ -1575,11 +1575,11 @@ body::before{
     center center, 
     center center;
     
-  background-blend-mode: screen, overlay, hard-light, multiply;
+  background-blend-mode: screen, overlay, soft-light, multiply;  /* hard-lightをsoft-lightに */
 
   mix-blend-mode: lighten;
-  filter: brightness(1.6) contrast(1.4) saturate(0.8);
-  opacity: .9;
+  filter: brightness(1.3) contrast(1.3) saturate(0.8);  /* 明るさを抑える */
+  opacity: .75;  /* 不透明度を下げる */
 }
 
 /* Secret Rare専用の追加のキラキラレイヤー */
@@ -1592,8 +1592,8 @@ body::before{
     var(--glitter-secret),
     radial-gradient(
       circle at var(--pointer-x) var(--pointer-y),
-      hsla(45, 100%, 90%, 0.6) 0%,
-      hsla(45, 80%, 70%, 0.3) 20%,
+      hsla(45, 90%, 80%, 0.4) 0%,   /* 明るさと不透明度を抑える */
+      hsla(45, 70%, 65%, 0.2) 20%,
       transparent 50%
     );
     
@@ -1606,8 +1606,8 @@ body::before{
     var(--pointer-x) var(--pointer-y);
     
   mix-blend-mode: screen;
-  opacity: calc(0.7 + (var(--pointer-from-center) * 0.3));
-  filter: brightness(1.8);
+  opacity: calc(0.5 + (var(--pointer-from-center) * 0.2));  /* 不透明度を抑える */
+  filter: brightness(1.4);  /* 明るさを抑える */
 }
 
 /* ===============================================
@@ -1776,15 +1776,15 @@ body::before{
   background-image: 
     radial-gradient( 
       farthest-corner circle at var(--pointer-x) var(--pointer-y), 
-      hsla(45, 100%, 92%, 0.7) 0%,      /* 非常に明るいゴールドハイライト */
-      hsla(45, 95%, 78%, 0.5) 15%,      /* ミディアムゴールド */
-      hsla(45, 70%, 60%, 0.35) 30%,     /* ディープゴールド */
-      hsla(40, 40%, 40%, 0.2) 50%,      /* 暗いゴールド */
-      hsl(22, 15%, 12%) 100%            /* 背景へフェード */
+      hsla(45, 85%, 78%, 0.45) 0%,      /* 明るさと不透明度を抑える */
+      hsla(45, 75%, 65%, 0.35) 15%,     
+      hsla(45, 60%, 52%, 0.25) 30%,     
+      hsla(40, 35%, 38%, 0.15) 50%,      
+      hsl(22, 15%, 12%) 100%            
     );
-  filter: brightness(1.6) contrast(1.8);
-  mix-blend-mode: hard-light;  /* より強い光 */
-  opacity: 0.95;
+  filter: brightness(1.25) contrast(1.5);  /* 明るさを抑える */
+  mix-blend-mode: soft-light;  /* hard-lightをsoft-lightに変更 */
+  opacity: 0.8;  /* 不透明度を下げる */
 }
 
 /* Secret Rare専用の追加グレア層 */
@@ -1796,14 +1796,14 @@ body::before{
   background-image: 
     radial-gradient(
       circle at var(--pointer-x) var(--pointer-y),
-      hsla(45, 100%, 95%, 0.8) 0%,
-      hsla(45, 90%, 80%, 0.4) 10%,
+      hsla(45, 90%, 85%, 0.5) 0%,   /* 不透明度を抑える */
+      hsla(45, 80%, 72%, 0.25) 10%,
       transparent 30%
     );
     
   mix-blend-mode: screen;
-  opacity: calc(0.5 + (var(--pointer-from-center) * 0.4));
-  filter: blur(20px) brightness(2);
+  opacity: calc(0.35 + (var(--pointer-from-center) * 0.25));  /* 不透明度を大幅に抑える */
+  filter: blur(15px) brightness(1.4);  /* 明るさを抑える */
 }
 
 .card[data-rarity="rare shiny vmax"] .card__glare {
@@ -2041,53 +2041,200 @@ body::before{
 
 
 /* ===============================================
-   SECRET RARE 専用の追加エフェクト
+   全レアリティ共通の動的アニメーション
    =============================================== */
 
 /* カードがアクティブな時のさらなる輝き強化 */
 .card.active[data-rarity="rare secret"] .card__shine {
-  filter: brightness(calc( 0.7 + (var(--pointer-from-center) * 0.4) )) contrast(1.4) saturate(2.5);
-  animation: secretGlow 2s ease-in-out infinite;
+  filter: brightness(calc( 0.6 + (var(--pointer-from-center) * 0.3) )) contrast(1.25) saturate(2.0);
+  animation: secretGlow 2.5s ease-in-out infinite;
 }
 
-/* パルス効果 */
+.card.active[data-rarity="rare shiny vmax"] .card__shine {
+  filter: brightness(1.15) contrast(1.15) saturate(1.05);
+  animation: vmaxGlow 3s ease-in-out infinite;
+}
+
+.card.active[data-rarity="rare holo vstar"] .card__shine {
+  filter: brightness(calc((var(--pointer-from-center) * .9) + .4)) contrast(2.3) saturate(1.5);
+  animation: vstarGlow 2.8s ease-in-out infinite;
+}
+
+/* Secret Rareのパルス効果（控えめ） */
 @keyframes secretGlow {
   0%, 100% {
-    filter: brightness(calc( 0.7 + (var(--pointer-from-center) * 0.4) )) contrast(1.4) saturate(2.5);
+    filter: brightness(calc( 0.6 + (var(--pointer-from-center) * 0.3) )) contrast(1.25) saturate(2.0);
   }
   50% {
-    filter: brightness(calc( 0.75 + (var(--pointer-from-center) * 0.45) )) contrast(1.5) saturate(2.7);
+    filter: brightness(calc( 0.63 + (var(--pointer-from-center) * 0.32) )) contrast(1.28) saturate(2.1);
   }
 }
 
-/* グリッターのシマー効果 */
-.card[data-rarity="rare secret"] .card__shine {
-  animation: glitterShimmer 3s ease-in-out infinite;
+/* Shiny VMAXの虹色シフト */
+@keyframes vmaxGlow {
+  0%, 100% {
+    filter: brightness(1.15) contrast(1.15) saturate(1.05) hue-rotate(0deg);
+  }
+  33% {
+    filter: brightness(1.18) contrast(1.17) saturate(1.08) hue-rotate(5deg);
+  }
+  66% {
+    filter: brightness(1.16) contrast(1.16) saturate(1.06) hue-rotate(-5deg);
+  }
+}
+
+/* V-STARのシルバーシマー */
+@keyframes vstarGlow {
+  0%, 100% {
+    filter: brightness(calc((var(--pointer-from-center) * .9) + .4)) contrast(2.3) saturate(1.5);
+  }
+  50% {
+    filter: brightness(calc((var(--pointer-from-center) * .95) + .42)) contrast(2.4) saturate(1.55);
+  }
+}
+
+/* グリッターのシマー効果（全レアリティ） */
+.card[data-rarity="rare secret"] .card__shine,
+.card[data-rarity="rare shiny vmax"] .card__shine,
+.card[data-rarity="rare holo vstar"] .card__shine {
+  animation: glitterShimmer 4s ease-in-out infinite;
 }
 
 @keyframes glitterShimmer {
   0%, 100% {
-    background-position: 
-      var(--background-x) var(--background-y),
-      42% 43%, 
-      58% 57%,
-      50% 50%, 
-      center center, 
-      center center;
+    opacity: 1;
   }
   50% {
-    background-position: 
-      var(--background-x) var(--background-y),
-      43% 44%, 
-      57% 56%,
-      51% 51%, 
-      center center, 
-      center center;
+    opacity: 0.98;
   }
 }
 
-/* ゴールドの輝き強調 */
+/* ホバー時のエフェクト（全レアリティ） */
 .card[data-rarity="rare secret"]:hover {
-  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6))
-          drop-shadow(0 0 40px rgba(255, 215, 0, 0.3));
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4))
+          drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
+}
+
+.card[data-rarity="rare shiny vmax"]:hover {
+  filter: drop-shadow(0 0 15px rgba(200, 150, 255, 0.4))
+          drop-shadow(0 0 30px rgba(150, 200, 255, 0.2));
+}
+
+.card[data-rarity="rare holo vstar"]:hover {
+  filter: drop-shadow(0 0 15px rgba(150, 220, 255, 0.4))
+          drop-shadow(0 0 30px rgba(180, 200, 255, 0.2));
+}
+
+/* コレクション内のカードにもアニメーションを適用 */
+.collectItem .card[data-rarity="rare secret"] .card__shine,
+.collectItem .card[data-rarity="rare shiny vmax"] .card__shine,
+.collectItem .card[data-rarity="rare holo vstar"] .card__shine {
+  animation: glitterShimmer 4s ease-in-out infinite;
+}
+
+.collectItem .card.active[data-rarity="rare secret"] .card__shine {
+  animation: secretGlow 2.5s ease-in-out infinite;
+}
+
+.collectItem .card.active[data-rarity="rare shiny vmax"] .card__shine {
+  animation: vmaxGlow 3s ease-in-out infinite;
+}
+
+.collectItem .card.active[data-rarity="rare holo vstar"] .card__shine {
+  animation: vstarGlow 2.8s ease-in-out infinite;
+}
+
+/* コレクション内のカードのホバー効果 */
+.collectItem:hover .card[data-rarity="rare secret"] {
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5));
+}
+
+.collectItem:hover .card[data-rarity="rare shiny vmax"] {
+  filter: drop-shadow(0 0 12px rgba(200, 150, 255, 0.5));
+}
+
+.collectItem:hover .card[data-rarity="rare holo vstar"] {
+  filter: drop-shadow(0 0 12px rgba(150, 220, 255, 0.5));
+}
+
+
+/* ===============================================
+   コレクション内のホロカード表示調整
+   =============================================== */
+
+/* コレクション内のカードのサイズ調整 */
+.collectItem .card {
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+.collectItem .card__translater {
+  aspect-ratio: 2.5 / 3.5;
+}
+
+.collectItem .card__rotator {
+  width: 100%;
+  height: 100%;
+}
+
+.collectItem .card__front {
+  width: 100%;
+  height: 100%;
+}
+
+.collectItem .card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* コレクション内のカードメタデータ位置調整 */
+.collectItem .card__meta {
+  display: block !important;  /* コレクション内では表示 */
+  font-size: 11px;
+  padding: 6px 8px;
+}
+
+/* コレクション内のカードはtouch-action: noneでスクロールを防止 */
+.collectItem .card__rotator {
+  touch-action: none;
+}
+
+
+/* ===============================================
+   スマホでのスクロール制御
+   =============================================== */
+
+/* カードエリアでのタッチ操作時、ページスクロールを防止 */
+.card__rotator {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* カードリビールエリア全体でオーバースクロールを防止 */
+.cardReveal {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: auto;
+}
+
+/* フリップラッパーでのタッチ操作制御 */
+.flipWrap {
+  touch-action: none;
+}
+
+/* モーダル内のカードコレクショングリッド */
+.collectionGrid {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* コレクションアイテムはスクロール可能だが、カード自体はスクロール防止 */
+.collectItem {
+  touch-action: auto;
+}
+
+.collectItem .card {
+  touch-action: none;
 }
