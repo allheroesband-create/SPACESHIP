@@ -1934,14 +1934,14 @@ body::before{
   position: absolute;
   inset: 0;
   z-index: 5;  /* エフェクトレイヤー1 */
-  transform: translateZ(10px);
+  transform: translateZ(35px);
 }
 
 .card__glare {
   position: absolute;
   inset: 0;
   z-index: 6;  /* エフェクトレイヤー2 */
-  transform: translateZ(35px);
+  transform: translateZ(10px);
 }
 
 .card__overlay {
@@ -1965,4 +1965,5 @@ body::before{
 .card__rotator:hover .card__overlay {
   transform: translateZ(30px);
 }
+
 
