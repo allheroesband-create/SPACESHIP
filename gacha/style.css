@@ -1508,3 +1508,303 @@ body::before{
 	opacity: 1;
 
 }
+
+
+
+
+
+
+
+
+
+
+/* ===============================================
+   ENHANCED HOLOGRAPHIC EFFECTS WITH TEXTURES
+   =============================================== */
+
+/* グローバルテクスチャ変数の定義 */
+:root {
+  --texture-galaxy: url('./assets/galaxy-source.png');
+  --texture-cosmos: url('./assets/cosmos.png');
+  --texture-cosmos-trans: url('./assets/cosmos-middle-trans.png');
+  --texture-wave: url('./assets/wave.png');
+  --texture-vmax: url('./assets/vmaxbg.jpg');
+}
+
+/* ===============================================
+   SECRET RARE (SPECIAL) - ギャラクシーテクスチャ
+   =============================================== */
+
+.card[data-rarity="rare secret"] .card__shine {
+  background-image:
+    var(--texture-galaxy),
+    var(--glitter), 
+    var(--glitter), 
+    conic-gradient( 
+      var(--sunpillar-clr-4), 
+      var(--sunpillar-clr-5),
+      var(--sunpillar-clr-6), 
+      var(--sunpillar-clr-1), 
+      var(--sunpillar-clr-4) 
+    ), 
+    radial-gradient( 
+      farthest-corner circle at var(--pointer-x) var(--pointer-y), 
+      hsla(150, 00%, 0%, .98) 10%, 
+      hsla(0, 0%, 95%, .15) 90% 
+    );
+
+  background-size: 
+    200% 200%, 
+    var(--glittersize) var(--glittersize), 
+    var(--glittersize) var(--glittersize), 
+    cover, 
+    cover;
+    
+  background-position: 
+    var(--background-x) var(--background-y),
+    45% 45%, 
+    55% 55%, 
+    center center, 
+    center center;
+    
+  background-blend-mode: screen, soft-light, hard-light, overlay;
+  mix-blend-mode: color-dodge;
+  filter: brightness(calc( 0.5 + (var(--pointer-from-center) * 0.3) )) contrast(1.2) saturate(2);
+}
+
+.card[data-rarity="rare secret"] .card__shine:before {
+  background-image:
+    var(--texture-cosmos),
+    linear-gradient( 45deg, hsl(46, 95%, 50%), hsl(52, 100%, 69%) ), 
+    radial-gradient( 
+      farthest-corner circle at var(--pointer-x) var(--pointer-y), 
+      hsla(10, 20%, 90%, 0.95) 10%, 
+      hsl(0, 0%, 0%) 70% 
+    );
+
+  background-size: 150% 150%, cover, cover;
+  background-position: 
+    calc(var(--background-x) * 1.5) calc(var(--background-y) * 1.5),
+    center center, 
+    center center;
+  background-blend-mode: overlay, hard-light, multiply;
+
+  mix-blend-mode: lighten;
+  filter: brightness(1.4) contrast(1.3) saturate(0.5);
+  opacity: .85;
+}
+
+/* ===============================================
+   SHINY VMAX (COLONEL) - VMAXテクスチャ
+   =============================================== */
+
+.card[data-rarity="rare shiny vmax"] .card__shine {
+  background-image:
+    var(--texture-vmax),
+    var(--glitter),
+    var(--glitter),
+    linear-gradient( var(--angle), 
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4), var(--r-clr-5), var(--r-clr-6), var(--r-clr-7), 
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4), var(--r-clr-5), var(--r-clr-6), var(--r-clr-7), 
+      var(--r-clr-1), var(--r-clr-2), var(--r-clr-3), var(--r-clr-4), var(--r-clr-5), var(--r-clr-6), var(--r-clr-7), 
+      var(--r-clr-1)
+    ),
+    radial-gradient( 
+      farthest-corner circle at var(--pointer-x) var(--pointer-y), 
+      hsla(248, 5%, 10%, 1) 10%, 
+      hsla(206, 5%, 80%, 0.1) 50%, 
+      hsla(0, 0%, 95%, .98) 90% 
+    );
+
+  background-size: 
+    180% 180%,
+    var(--glittersize) var(--glittersize), 
+    var(--glittersize) var(--glittersize), 
+    400% 400%, 
+    cover;
+    
+  background-position: 
+    calc(var(--background-x) * 2) calc(var(--background-y) * 2),
+    40% 45%, 
+    55% 55%, 
+    calc( var(--background-x) * 1.5) calc( var(--background-y) * 1.5 ), 
+    center center;
+    
+  background-blend-mode: overlay, soft-light, overlay, color-burn;
+  filter: brightness(1.1) contrast(1.1) saturate(.95);
+}
+
+.card[data-rarity="rare shiny vmax"] .card__shine:before {
+  background-image:
+    var(--texture-cosmos-trans),
+    radial-gradient( 
+      farthest-corner circle at var(--pointer-x) var(--pointer-y), 
+      hsla(248, 5%, 91%, 0.95) 10%, 
+      hsla(206, 5%, 68%, 0.5) 50%, 
+      hsl(0, 0%, 0%) 120% 
+    );
+
+  background-size: 160% 160%, cover;
+  background-position: 
+    calc(var(--background-x) * 1.8) calc(var(--background-y) * 1.8),
+    center center;
+  background-blend-mode: screen, color-burn;
+
+  mix-blend-mode: lighten;
+  filter: brightness(1.2) contrast(1.2) saturate(.6);
+  opacity: 0.45;
+}
+
+/* ===============================================
+   V-STAR (LIEUTENANT COLONEL) - ウェーブテクスチャ
+   =============================================== */
+
+.card[data-rarity="rare holo vstar"] .card__shine {
+  background-image:
+    var(--texture-wave),
+    repeating-linear-gradient( 0deg, 
+      var(--sunpillar-clr-1) calc(var(--space)*1), 
+      var(--sunpillar-clr-2) calc(var(--space)*2), 
+      var(--sunpillar-clr-3) calc(var(--space)*3), 
+      var(--sunpillar-clr-4) calc(var(--space)*4), 
+      var(--sunpillar-clr-5) calc(var(--space)*5), 
+      var(--sunpillar-clr-6) calc(var(--space)*6), 
+      var(--sunpillar-clr-1) calc(var(--space)*7)
+    ),
+    repeating-linear-gradient( 
+      var(--angle), 
+      #0e152e 0%, 
+      hsl(180, 10%, 60%) 3.8%, 
+      hsl(180, 29%, 66%) 4.5%, 
+      hsl(180, 10%, 60%) 5.2%, 
+      #0e152e 10% , 
+      #0e152e 12% 
+    ),
+    radial-gradient(
+      farthest-corner circle 
+      at var(--pointer-x) var(--pointer-y),
+      hsla(0, 0%, 0%, 0.1) 12%, 
+      hsla(0, 0%, 0%, 0.15) 20%, 
+      hsla(0, 0%, 0%, 0.25) 120%
+    );
+
+  background-blend-mode: overlay, soft-light, hue, hard-light;
+  background-size: 
+    140% 140%,
+    200% 700%, 
+    300% 100%, 
+    200% 100%;
+    
+  background-position: 
+    calc(var(--background-x) * 2.5) calc(var(--background-y) * 2.5),
+    0% var(--background-y), 
+    var(--background-x) var(--background-y), 
+    var(--background-x) var(--background-y);
+  
+  filter: brightness(calc((var(--pointer-from-center) * .85) + .35)) contrast(2.2) saturate(1.4);
+}
+
+.card[data-rarity="rare holo vstar"] .card__shine:after {
+  background-image:
+    var(--texture-cosmos),
+    repeating-linear-gradient( 0deg, 
+      var(--sunpillar-clr-1) calc(var(--space)*1), 
+      var(--sunpillar-clr-2) calc(var(--space)*2), 
+      var(--sunpillar-clr-3) calc(var(--space)*3), 
+      var(--sunpillar-clr-4) calc(var(--space)*4), 
+      var(--sunpillar-clr-5) calc(var(--space)*5), 
+      var(--sunpillar-clr-6) calc(var(--space)*6), 
+      var(--sunpillar-clr-1) calc(var(--space)*7)
+    ),
+    repeating-linear-gradient( 
+      var(--angle), 
+      #0e152e 0%, 
+      hsl(180, 10%, 60%) 3.8%, 
+      hsl(180, 29%, 66%) 4.5%, 
+      hsl(180, 10%, 60%) 5.2%, 
+      #0e152e 10% , 
+      #0e152e 12% 
+    ),
+    radial-gradient(
+      farthest-corner circle 
+      at var(--pointer-x) var(--pointer-y),
+      hsla(0, 0%, 0%, 0.1) 12%, 
+      hsla(0, 0%, 0%, 0.15) 20%, 
+      hsla(0, 0%, 0%, 0.25) 120%
+    );
+
+  background-size: 
+    120% 120%,
+    200% 400%, 
+    195% 100%, 
+    200% 100%;
+    
+  background-position: 
+    calc(var(--background-x) * -1.5) calc(var(--background-y) * -1.5),
+    0% var(--background-y), 
+    calc( var(--background-x) * -1) calc( var(--background-y) * -1), 
+    var(--background-x) var(--background-y);
+
+  filter: brightness(calc((var(--pointer-from-center) * .85) + .6)) contrast(1.7) saturate(1.7);
+  mix-blend-mode: exclusion;
+}
+
+/* ===============================================
+   強化されたGLARE効果
+   =============================================== */
+
+.card[data-rarity="rare secret"] .card__glare {
+  background-image: 
+    radial-gradient( 
+      farthest-corner circle at var(--pointer-x) var(--pointer-y), 
+      hsla(45, 80%, 85%, 0.4) 0%, 
+      hsla(45, 40%, 50%, 0.2) 30%,
+      hsl(22, 15%, 12%) 180%
+    );
+  filter: brightness(1.5) contrast(1.8);
+  mix-blend-mode: hard-light;
+}
+
+.card[data-rarity="rare shiny vmax"] .card__glare {
+  background-image: 
+    radial-gradient( 
+      farthest-corner circle at 
+      var(--pointer-x) var(--pointer-y), 
+      hsla(280, 60%, 85%, 0.5) 0%,
+      hsla(200, 50%, 70%, 0.4) 20%, 
+      hsla(248, 5%, 50%, 0.3) 45%, 
+      hsla(0, 0%, 0%, .4) 120% 
+    );
+  filter: brightness(1.2) contrast(1.4);
+}
+
+.card[data-rarity="rare holo vstar"] .card__glare {
+  background-image: 
+    radial-gradient( 
+      farthest-corner circle at var(--pointer-x) var(--pointer-y), 
+      hsl(195, 95%, 92%) 5%,
+      hsl(180, 80%, 75%) 25%, 
+      hsl(300, 3%, 60%) 60%, 
+      hsl(350, 0%, 15%) 150% 
+    );
+  filter: brightness(.85) contrast(2.2);
+  mix-blend-mode: hard-light;
+  opacity: calc(var(--card-opacity)*(var(--pointer-from-center)*.85));
+}
+
+/* ===============================================
+   アニメーション強化
+   =============================================== */
+
+.card[data-rarity="rare secret"] .card__shine,
+.card[data-rarity="rare shiny vmax"] .card__shine,
+.card[data-rarity="rare holo vstar"] .card__shine {
+  transition: all 0.1s ease-out;
+}
+
+.card.active[data-rarity="rare secret"],
+.card.active[data-rarity="rare shiny vmax"],
+.card.active[data-rarity="rare holo vstar"] {
+  transform: scale(1.02);
+  transition: transform 0.3s ease-out;
+}
