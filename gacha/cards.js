@@ -546,5 +546,3 @@ export {
   displayCardsByRarity,
   CardCollection
 };
-
-
