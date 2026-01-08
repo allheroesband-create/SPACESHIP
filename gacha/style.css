@@ -94,7 +94,7 @@ body::before{
 .gun{
   position: absolute;
   z-index: 3;
-  bottom: 0vh;
+  bottom: 8vh;
   left: 50%;
   transform: translateX(-50%);
 
@@ -123,6 +123,186 @@ body::before{
 .gun.playing{
   transform: translateX(-50%);
   filter: drop-shadow(0 0 18px rgba(255,210,120,0.25));
+}
+
+/* ---- ガチャを引くボタン ---- */
+.gachaBtn {
+  position: absolute;
+  z-index: 10;
+  bottom: 2vh;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  
+  padding: 16px 32px;
+  border: none;
+  border-radius: 50px;
+  
+  background: linear-gradient(
+    135deg,
+    #ffd700 0%,
+    #ffb700 25%,
+    #ffa500 50%,
+    #ffb700 75%,
+    #ffd700 100%
+  );
+  background-size: 200% 200%;
+  
+  box-shadow:
+    0 4px 15px rgba(255, 183, 0, 0.4),
+    0 8px 30px rgba(255, 165, 0, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  
+  cursor: pointer;
+  transition: all 0.3s ease;
+  animation: gachaShine 3s ease-in-out infinite, gachaPulse 2s ease-in-out infinite;
+}
+
+/* スマホではボタンを非表示にし、スワイプヒントを表示 */
+@media (max-width: 768px) and (pointer: coarse) {
+  .gachaBtn {
+    display: none;
+  }
+}
+
+.gachaBtn:hover {
+  transform: translateX(-50%) scale(1.08);
+  box-shadow:
+    0 6px 20px rgba(255, 183, 0, 0.5),
+    0 12px 40px rgba(255, 165, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.gachaBtn:active {
+  transform: translateX(-50%) scale(0.95);
+  box-shadow:
+    0 2px 10px rgba(255, 183, 0, 0.4),
+    0 4px 20px rgba(255, 165, 0, 0.3),
+    inset 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.gachaBtn__icon {
+  font-size: 24px;
+  animation: iconSpin 4s ease-in-out infinite;
+}
+
+.gachaBtn__text {
+  font-family: "Cinzel", serif;
+  font-weight: 800;
+  font-size: 18px;
+  color: #1a0a00;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.1em;
+}
+
+/* ---- スワイプヒント（スマホ用） ---- */
+.swipeHint {
+  position: absolute;
+  z-index: 10;
+  bottom: 3vh;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  
+  color: rgba(255, 215, 120, 0.9);
+  text-align: center;
+}
+
+@media (max-width: 768px) and (pointer: coarse) {
+  .swipeHint {
+    display: flex;
+  }
+}
+
+.swipeHint__arrow {
+  font-size: 32px;
+  animation: swipeArrowBounce 1.5s ease-in-out infinite;
+}
+
+.swipeHint__text {
+  font-family: "Cinzel", serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.15em;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+@keyframes swipeArrowBounce {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(-12px); opacity: 1; }
+}
+
+/* ---- スワイプフィードバック ---- */
+.swipeFeedback {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  z-index: 100;
+  
+  font-family: "Cinzel", serif;
+  font-size: 48px;
+  font-weight: 800;
+  color: #ffd700;
+  text-shadow:
+    0 0 20px rgba(255, 215, 0, 0.8),
+    0 0 40px rgba(255, 183, 0, 0.6),
+    0 0 60px rgba(255, 165, 0, 0.4);
+  
+  pointer-events: none;
+  animation: swipeFeedbackPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.swipeFeedback.fadeOut {
+  animation: swipeFeedbackFade 0.3s ease-out forwards;
+}
+
+@keyframes swipeFeedbackPop {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+@keyframes swipeFeedbackFade {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
+}
+
+@keyframes gachaShine {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes gachaPulse {
+  0%, 100% { 
+    box-shadow:
+      0 4px 15px rgba(255, 183, 0, 0.4),
+      0 8px 30px rgba(255, 165, 0, 0.3),
+      inset 0 2px 4px rgba(255, 255, 255, 0.4),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  }
+  50% { 
+    box-shadow:
+      0 4px 25px rgba(255, 183, 0, 0.6),
+      0 8px 50px rgba(255, 165, 0, 0.5),
+      inset 0 2px 4px rgba(255, 255, 255, 0.4),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes iconSpin {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-10deg) scale(1.1); }
+  75% { transform: rotate(10deg) scale(1.1); }
 }
 
 /* ---- stage / controls ---- */
@@ -199,7 +379,6 @@ body::before{
   -webkit-transform: translateZ(0);
 }
 
-/* ★重要：backfaceが効かない環境でも破綻しにくいようにZを付ける */
 .face{
   position: absolute;
   inset: 0;
@@ -229,13 +408,11 @@ body::before{
   font-family: "Cinzel", serif;
 }
 
-/* 表面は最初から180度回しておく */
 .face.front{
   transform: rotateY(180deg) translateZ(3px);
   -webkit-transform: rotateY(180deg) translateZ(3px);
 }
 
-/* ★フィルター(filter)をアニメに入れると backface が壊れるブラウザがあるので消す */
 .flipWrap.reveal .flip{
   animation: flipIn 0.85s cubic-bezier(.2,.9,.2,1) forwards;
 }
