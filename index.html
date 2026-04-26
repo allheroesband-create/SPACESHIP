@@ -661,8 +661,18 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
                     </div>
                 </div>
 
-              <div class="square-button" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC.png');" onclick="location.href='#'">
+             <div class="square-button" id="btn" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC.png');">
     量子陰謀学
+</div>
+
+<script>
+  const img = new Image();
+  img.src = 'QC.png';
+  img.onload = () => {
+    const ratio = img.naturalWidth / img.naturalHeight;
+    document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+  };
+</script>
 </div>
 </div>
                 <div class="tab_container">
