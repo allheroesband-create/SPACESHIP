@@ -545,22 +545,23 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
                 gap: 10px;
             }
         }
+        #bg-gif {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-image: url('ファイル名.gif');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.3;
+}
     </style>
 </head>
 <body>
-body {
-    cursor: none;
-    margin: 0;
-    background: #0a0a0a;
-    color: #e0e0e0;
-    
-    /* ↓ これを追加 */
-    background-image: url('QC2.gif');
-    background-size: cover;       /* 画面いっぱいに広げる */
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed; /* スクロールしても固定 */
-}
+
+<div id="bg-gif" aria-hidden="true"></div>  ← ここに追加
+<div id="cursor" aria-hidden="true"></div>
+...
     <!-- カーソル要素 -->
 <div id="cursor" aria-hidden="true"></div>
 
