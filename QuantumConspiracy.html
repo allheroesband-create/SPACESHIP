@@ -553,12 +553,25 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.3;
+    opacity: 0;
 }
     </style>
 </head>
 <body>
+<div class="square-button" id="btn" 
+     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC.png');" 
+     onclick="location.href='https://allheroesband-create.github.io/QC1jyosetsu/'">
+</div>
 
+<script>
+  const img = new Image();
+  img.src = 'QC1.png';
+  img.onload = () => {
+    const ratio = img.naturalWidth / img.naturalHeight;
+    document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+  };
+</script>
+</div>
 <div id="bg-gif" aria-hidden="true"></div>
 <div id="cursor" aria-hidden="true"></div>
 ...
@@ -571,25 +584,8 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         </div>
 
         <div id="content">
-            <div id="basic-accordian">
-                <div class="latest-posts">
-                    <h3>Archives</h3>
-                    <div id="archives">
-                        <div class="archive-category">
-                            <button class="archive-category-btn" onclick="toggleArchiveCategory('mode')">MODE</button>
-                            <div id="mode-items" class="archive-items">
-                                <ul>
-                                      <li><a href="gas.html">GAS</a></li>
-                                      <li><a href="dome.html">DOME</a></li>
-                                      <li><a href="pack.html">PACK</a></li>
-                                      <li><a href="slomo.html">SLOMO</a></li>
-                                      <li><a href="isolation.html">ISOLATION</a></li>
-                                      <li><a href="with.html">WITH</a></li>
-                                      <li><a href="departure.html">DEPARTURE</a></li>
-
-                                </ul>
-                            </div>
-                        </div>
+            
+                       
 
                        
                         <form method="get" id="searchform">
