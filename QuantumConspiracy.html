@@ -567,20 +567,27 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         <div id="content">
             <body>
 
-<!-- ★修正②：url('QC.png') → url('QC1.png') に変更 -->
-<div class="square-button" id="btn" 
-     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC1.png');" 
-     onclick="location.href='https://allheroesband-create.github.io/QC1jyosetsu/'">
-</div>
+            <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
 
-<script>
-  const img = new Image();
-  img.src = 'QC1.png';
-  img.onload = () => {
-    const ratio = img.naturalWidth / img.naturalHeight;
-    document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
-  };
-</script>
+                <div class="square-button" id="btn" 
+                     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC1.png');" 
+                     onclick="location.href='https://allheroesband-create.github.io/QC1jyosetsu/'">
+                </div>
+
+                <script>
+                  const img = new Image();
+                  img.src = 'QC1.png';
+                  img.onload = () => {
+                    document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+                  };
+                </script>
+
+                <form method="get" id="searchform">
+                    <input type="text" placeholder="Search archives..." name="s" id="s" />
+                    <input type="submit" id="searchsubmit" value="Search" />
+                </form>
+
+            </div>
 
         </div>
 
