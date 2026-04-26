@@ -557,20 +557,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 }
     </style>
 </head>
-<body>
-<div class="square-button" id="btn" 
-     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC.png');" 
-     onclick="location.href='https://allheroesband-create.github.io/QC1jyosetsu/'">
-</div>
-
-<script>
-  const img = new Image();
-  img.src = 'QC1.png';
-  img.onload = () => {
-    const ratio = img.naturalWidth / img.naturalHeight;
-    document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
-  };
-</script>
+    
 </div>
 <div id="bg-gif" aria-hidden="true"></div>
 <div id="cursor" aria-hidden="true"></div>
@@ -584,7 +571,20 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         </div>
 
         <div id="content">
-            
+            <body>
+<div class="square-button" id="btn" 
+     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC.png');" 
+     onclick="location.href='https://allheroesband-create.github.io/QC1jyosetsu/'">
+</div>
+
+<script>
+  const img = new Image();
+  img.src = 'QC1.png';
+  img.onload = () => {
+    const ratio = img.naturalWidth / img.naturalHeight;
+    document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+  };
+</script>
                        
 
                        
