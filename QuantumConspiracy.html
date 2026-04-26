@@ -52,10 +52,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
 }
-
-/* デバッグ枠（必要なら有効に） */
-/* #cursor { outline: 1px solid rgba(255,255,255,0.08); } */
-</style>
 </style>
 
     <style>
@@ -545,24 +541,22 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
                 gap: 10px;
             }
         }
+
+        /* ★修正①：opacity: 0 → 1 に変更 */
         #bg-gif {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-image: url('QC2.gif');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    opacity: 0;
-}
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-image: url('QC2.gif');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 1;
+        }
     </style>
 </head>
-    
-</div>
+
 <div id="bg-gif" aria-hidden="true"></div>
-<div id="cursor" aria-hidden="true"></div>
-...
-    <!-- カーソル要素 -->
 <div id="cursor" aria-hidden="true"></div>
 
     <div id="page">
@@ -572,8 +566,10 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 
         <div id="content">
             <body>
+
+<!-- ★修正②：url('QC.png') → url('QC1.png') に変更 -->
 <div class="square-button" id="btn" 
-     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC.png');" 
+     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC1.png');" 
      onclick="location.href='https://allheroesband-create.github.io/QC1jyosetsu/'">
 </div>
 
@@ -585,9 +581,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
     document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
   };
 </script>
-                       
 
-                       
                         <form method="get" id="searchform">
                             <div>
                                 <input type="text" placeholder="Search archives..." name="s" id="s" />
@@ -596,28 +590,15 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
                         </form>
                     </div>
                 </div>
-
-
-<form method="get" id="searchform">
-                                <div>
-                                    <input type="text" placeholder="Search archives..." name="s" id="s" />
-                                    <input type="submit" id="searchsubmit" value="Search" />
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
         <div id="footer">
-            <p>SPACESHIP </p>
+            <p>SPACESHIP</p>
         </div>
     </div>
 
-    
     <script>
-        
         function toggleTab(tab) {
             const homeHeader = document.getElementById('home-header');
             const menuHeader = document.getElementById('menu-header');
@@ -641,7 +622,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             const itemsDiv = document.getElementById(category + '-items');
             const button = event.target;
             
-            // Toggle the clicked category
             if (itemsDiv.classList.contains('show')) {
                 itemsDiv.classList.remove('show');
                 button.classList.remove('active');
@@ -651,22 +631,12 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             }
         }
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('home-content').classList.add('active');
+            document.getElementById('home-content') && document.getElementById('home-content').classList.add('active');
         });
     </script>
 
     <script>
-/*
-  改善ポイント実装：
-  - 軌跡生成にレート制限（minInterval）
-  - 同時生成数上限（maxTrails）
-  - 軌跡を中央に置くため transform: translate(-50%,-50%) を利用
-  - タッチ対応（タッチ時はタッチ座標で発生）
-  - エラー回避（#cursor が null の場合は no-op）
-*/
-
 (function(){
   const cursor = document.getElementById('cursor');
   if(!cursor) return;
@@ -675,13 +645,11 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   let mouseY = window.innerHeight / 2;
   let cursorX = mouseX, cursorY = mouseY;
 
-  // レート制限 & 最大生成数
-  const minInterval = 40; // ms（これ以下の間隔では生成しない）
+  const minInterval = 40;
   let lastTrailTime = 0;
   const maxTrails = 60;
   let activeTrails = 0;
 
-  // マウス移動
   document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX; mouseY = e.clientY;
 
@@ -692,7 +660,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
     }
   }, { passive: true });
 
-  // タッチ対応（タッチ開始 or move）
   function onTouch(e){
     if(!e) return;
     const t = e.touches && e.touches[0];
@@ -707,7 +674,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   document.addEventListener('touchstart', onTouch, { passive: true });
   document.addEventListener('touchmove', onTouch, { passive: true });
 
-  // カーソル滑らか追従
   function updateLoop(){
     cursorX += (mouseX - cursorX) * 0.22;
     cursorY += (mouseY - cursorY) * 0.22;
@@ -717,39 +683,30 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   }
   requestAnimationFrame(updateLoop);
 
-  // 軌跡生成
   function spawnTrail(x, y){
     const el = document.createElement('div');
     el.className = 'cursor-trail';
-    // 中心配置するため left/top + transform used in CSS
     el.style.left = x + 'px';
     el.style.top = y + 'px';
 
-    // 軌跡サイズと透明度に少しランダム幅を持たせる（視覚バリエーション）
-    const s = 4 + Math.random() * 6; // 4-10px
+    const s = 4 + Math.random() * 6;
     el.style.width = s + 'px';
     el.style.height = s + 'px';
     el.style.opacity = (0.7 + Math.random()*0.3).toString();
 
-    // append
     document.body.appendChild(el);
     activeTrails++;
 
-    // cleanup：アニメーション長と合わせて削除（少し余裕）
-    const life = 1000; // ms
+    const life = 1000;
     setTimeout(()=>{
       if(el && el.parentNode) el.parentNode.removeChild(el);
       activeTrails = Math.max(0, activeTrails - 1);
     }, life + 50);
   }
 
-  // デバッグ用：エラー確認
   window.__cursorTrailStatus = () => ({ mouseX, mouseY, cursorX, cursorY, activeTrails });
-
 })();
+    </script>
 
-</script>
-    
 </body>
-
 </html>
