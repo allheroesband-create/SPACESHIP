@@ -19,18 +19,18 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   z-index: 2147483647; /* 最前面 */
   background: radial-gradient(circle, #fff 0%, #fff 40%, #ffeecc 70%, transparent 100%);
   box-shadow: 0 0 12px #fff, 0 0 24px #fff, 0 0 36px #ffeecc;
-  clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  clip-path: polygon(50% 0%,62.5% 28.4%,93.3% 25%,75% 50%,93.3% 75%,62.5% 71.7%,50% 100%,37.5% 71.7%,6.7% 75%,25% 50%,6.7% 25%,37.5% 28.4%);
   animation: starMorph 2s ease-in-out infinite;
   will-change: transform, left, top;
   pointer-events: none;
 }
 
-/* 星のゆらぎ */
+/* 六芒星のゆらぎ */
 @keyframes starMorph {
-  0%,100% { clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
-  25% { clip-path: polygon(50% 5%,65% 30%,95% 40%,70% 55%,85% 90%,50% 75%,15% 90%,30% 55%,5% 40%,35% 30%); }
-  50% { clip-path: polygon(50% 2%,58% 38%,96% 32%,66% 60%,82% 88%,50% 68%,18% 88%,34% 60%,4% 32%,42% 38%); }
-  75% { clip-path: polygon(50% 8%,63% 33%,92% 38%,72% 58%,77% 93%,50% 72%,23% 93%,28% 58%,8% 38%,37% 33%); }
+  0%,100% { clip-path: polygon(50% 0%,62.5% 28.4%,93.3% 25%,75% 50%,93.3% 75%,62.5% 71.7%,50% 100%,37.5% 71.7%,6.7% 75%,25% 50%,6.7% 25%,37.5% 28.4%); }
+  25%      { clip-path: polygon(50% 2%,64% 27%,94% 23%,77% 50%,94% 77%,64% 74%,50% 98%,36% 74%,6% 77%,23% 50%,6% 23%,36% 27%); }
+  50%      { clip-path: polygon(50% 4%,61% 30%,91% 27%,73% 50%,91% 73%,61% 70%,50% 96%,39% 70%,9% 73%,27% 50%,9% 27%,39% 30%); }
+  75%      { clip-path: polygon(50% 1%,63% 29%,95% 24%,76% 50%,95% 76%,63% 73%,50% 99%,37% 73%,5% 76%,24% 50%,5% 24%,37% 29%); }
 }
 
 /* 軌跡 */
@@ -472,43 +472,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             margin: 8px 0;
         }
 
-        #searchform {
-            margin-top: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        #searchform input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            background: #0a0a0a;
-            border: 2px solid #333;
-            border-radius: 25px;
-            color: #e0e0e0;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        #searchform input[type="text"]:focus {
-            border-color: #ffffff;
-        }
-
-        #searchform input[type="submit"] {
-            padding: 10px 20px;
-            background: #ffffff;
-            color: #0a0a0a;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        #searchform input[type="submit"]:hover {
-            background: #00dd77;
-            transform: scale(1.05);
-        }
-
         #footer {
             text-align: center;
             padding: 40px 20px;
@@ -561,7 +524,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 
     <div id="page">
         <div id="header">
-            <h1><a href="index.html">SPACESHIP</a></h1>
+            <h1>量子陰謀学</h1>
         </div>
 
         <div id="content">
@@ -582,16 +545,18 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
                   };
                 </script>
 
-                <form method="get" id="searchform">
-                    <input type="text" placeholder="Search archives..." name="s" id="s" />
-                    <input type="submit" id="searchsubmit" value="Search" />
-                </form>
-
             </div>
 
         </div>
 
         <div id="footer">
+            <div style="margin-bottom: 30px;">
+                <div class="square-button"
+                     style="display:inline-flex; aspect-ratio:auto; width:200px; height:60px; font-size:1.4em; letter-spacing:4px; border-radius:30px;"
+                     onclick="location.href='https://allheroesband-create.github.io/SPACESHIP/'">
+                    COCKPIT
+                </div>
+            </div>
             <p>SPACESHIP</p>
         </div>
     </div>
