@@ -516,6 +516,80 @@ body {
 
     .navigation { flex-direction: column; gap: 10px; }
 }
+
+/* =============================================
+   post-hero: 画像背景＋テキストオーバーレイ投稿
+   ============================================= */
+.post-hero {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #333;
+    border-radius: 20px;
+    text-decoration: none;
+    margin-bottom: 1px;
+    background: #1a1a1a;   /* 画像なし時のデフォルト背景 */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.post-hero img {
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+    transition: transform 0.4s ease;
+}
+
+/* 画像なしの場合: .post-hero-text が単独で高さを持つ */
+.post-hero .post-hero-text {
+    min-height: 90px;
+}
+
+/* テキストを画像全体の上に中央寄せで重ねる */
+.post-hero .post-hero-text {
+    position: absolute;
+    inset: 0;                               /* 画像全域を覆う */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.35);       /* 薄い黒オーバーレイ */
+    text-align: center;
+    transition: background 0.3s ease;
+}
+
+.post-hero:hover .post-hero-text {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.post-hero .post-hero-text .postdate {
+    display: block;
+    font-size: 0.85em;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+}
+
+.post-hero .post-hero-text .post-title {
+    color: #ffffff;
+    font-size: 1.05em;
+    line-height: 1.5;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+}
+
+.post-hero:hover {
+    border-color: #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 10px 40px rgba(255,255,255,0.4);
+    z-index: 10;
+}
+
+.post-hero:hover img {
+    transform: scale(1.03);
+}
     </style>
 </head>
 <body>
@@ -621,41 +695,77 @@ body {
 
             <div id="home-content" class="active">
                 <div class="accordion_child">
-                    <a class="square-button" href="https://allheroesband-create.github.io/vernal-equinox/">
+                    <a class="post-hero" href="https://allheroesband-create.github.io/vernal-equinox/">
                         <img src="vernal-equinox.png" alt="Fantasy Springs #1 Vernal Equinox">
+                        <div class="post-hero-text">
+                            <span class="postdate">12.04.26</span>
+                            <span class="post-title">Fantasy Springs #1 Vernal Equinox</span>
+                        </div>
                     </a>
-                    <div class="post">
-                        <span class="postdate">19.03.26</span>
-                        <a href="https://allheroesband-create.github.io/before_we_stand_up_the_psychdelic_reason/">before I stand up the psychedelic reason サイケデリック理性を立ち上げる前に</a>
-                    </div>
-                    <div class="post">
-                        <span class="postdate">02.01.26</span>
-                        <a href="https://allheroesband-create.github.io/ageofpsychics/">The Age of Psychics 超能力者たちの時代（１）</a>
-                    </div>
-                    <div class="post">
-                        <span class="postdate">01.01.26</span>
-                        <a href="https://allheroesband-create.github.io/weluvcars/">車が大好き！！</a>
-                    </div>
-                    <div class="post">
-                        <span class="postdate">31.12.25</span>
-                        <a href="https://allheroesband-create.github.io/lines_and_screen/">映画の線と面</a>
-                    </div>
-                    <div class="post">
-                        <span class="postdate">24.12.25</span>
-                        <a href="https://allheroesband-create.github.io/The_Quantum_Blinker/">The_Quantum_Blinker</a>
-                    </div>
-                    <div class="post">
-                        <span class="postdate">21.12.25</span>
-                        <a href="https://allheroesband-create.github.io/entropy_riser/">エントロピープールとライザー</a>
-                    </div>
-                    <div class="post">
-                        <span class="postdate">20.12.25</span>
-                        <a href="https://allheroesband-create.github.io/permutation_city/">進歩、前進。あるいは永劫へ　―イーガンの順列都市―</a>
-                    </div>
-                    <div class="post">
-                        <span class="postdate">06.12.25</span>
-                        <a href="https://allheroesband-create.github.io/POPS-is-DEAD-but-I-Still-L-VE-in-Pops-WEAPONS-/">POPS is DEAD but I Still L♡VE in Pops!!! ―『WEAPONS』評 ―</a>
-                    </div>
+                    <a class="post-hero" href="https://allheroesband-create.github.io/before_we_stand_up_the_psychdelic_reason/">
+                        <!-- 画像を設定する場合: src="" を編集 -->
+                        <img src="before_we_stand_up_the_psychdelic_reason.png" alt="before I stand up the psychedelic reason サイケデリック理性を立ち上げる前に" style="display:none;">
+                        <div class="post-hero-text">
+                            <span class="postdate">19.03.26</span>
+                            <span class="post-title">before I stand up the psychedelic reason サイケデリック理性を立ち上げる前に</span>
+                        </div>
+                    </a>
+                    <a class="post-hero" href="https://allheroesband-create.github.io/ageofpsychics/">
+                        <!-- 画像を設定する場合: src="" を編集 -->
+                        <img src="" alt="The Age of Psychics 超能力者たちの時代（１）" style="display:none;">
+                        <div class="post-hero-text">
+                            <span class="postdate">02.01.26</span>
+                            <span class="post-title">The Age of Psychics 超能力者たちの時代（１）</span>
+                        </div>
+                    </a>
+                    <a class="post-hero" href="https://allheroesband-create.github.io/weluvcars/">
+                        <!-- 画像を設定する場合: src="" を編集 -->
+                        <img src="" alt="車が大好き！！" style="display:none;">
+                        <div class="post-hero-text">
+                            <span class="postdate">01.01.26</span>
+                            <span class="post-title">車が大好き！！</span>
+                        </div>
+                    </a>
+                    <a class="post-hero" href="https://allheroesband-create.github.io/lines_and_screen/">
+                        <!-- 画像を設定する場合: src="" を編集 -->
+                        <img src="" alt="映画の線と面" style="display:none;">
+                        <div class="post-hero-text">
+                            <span class="postdate">31.12.25</span>
+                            <span class="post-title">映画の線と面</span>
+                        </div>
+                    </a>
+                    <a class="post-hero" href="https://allheroesband-create.github.io/The_Quantum_Blinker/">
+                        <!-- 画像を設定する場合: src="" を編集 -->
+                        <img src="" alt="The_Quantum_Blinker" style="display:none;">
+                        <div class="post-hero-text">
+                            <span class="postdate">24.12.25</span>
+                            <span class="post-title">The_Quantum_Blinker</span>
+                        </div>
+                    </a>
+                    <a class="post-hero" href="https://allheroesband-create.github.io/entropy_riser/">
+                        <!-- 画像を設定する場合: src="" を編集 -->
+                        <img src="" alt="エントロピープールとライザー" style="display:none;">
+                        <div class="post-hero-text">
+                            <span class="postdate">21.12.25</span>
+                            <span class="post-title">エントロピープールとライザー</span>
+                        </div>
+                    </a>
+                    <a class="post-hero" href="https://allheroesband-create.github.io/permutation_city/">
+                        <!-- 画像を設定する場合: src="" を編集 -->
+                        <img src="" alt="進歩、前進。あるいは永劫へ　―イーガンの順列都市―" style="display:none;">
+                        <div class="post-hero-text">
+                            <span class="postdate">20.12.25</span>
+                            <span class="post-title">進歩、前進。あるいは永劫へ　―イーガンの順列都市―</span>
+                        </div>
+                    </a>
+                    <a class="post-hero" href="https://allheroesband-create.github.io/POPS-is-DEAD-but-I-Still-L-VE-in-Pops-WEAPONS-/">
+                        <!-- 画像を設定する場合: src="" を編集 -->
+                        <img src="" alt="POPS is DEAD but I Still L♡VE in Pops!!! ―『WEAPONS』評 ―" style="display:none;">
+                        <div class="post-hero-text">
+                            <span class="postdate">06.12.25</span>
+                            <span class="post-title">POPS is DEAD but I Still L♡VE in Pops!!! ―『WEAPONS』評 ―</span>
+                        </div>
+                    </a>
                     <div class="navigation">
                         <a href="#">&laquo; Previous Entries</a>
                         <a href="#">Next Page &raquo;</a>
