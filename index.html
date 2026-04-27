@@ -566,9 +566,10 @@ body {
     grid-area: stack;
     display: block;
     width: 100%;
-    height: auto;               /* 画像の自然なアスペクト比でコンテナ高さが決まる */
+    height: 100%;               /* コンテナ全体を埋める */
+    object-fit: cover;          /* アスペクト比を保ちながら全体をカバー */
     pointer-events: none;
-    z-index: 0;                 /* テキストより下 */
+    z-index: 0;
     transition: transform 0.4s ease;
 }
 
