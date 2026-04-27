@@ -519,49 +519,46 @@ body {
 
 /* =============================================
    post-hero: 画像背景＋テキストオーバーレイ投稿
+   img と .post-hero-text を CSS Grid で同セルに重ねる。
+   コンテナ高さはどちらか大きい方に追従 → テキスト見切れなし。
    ============================================= */
 .post-hero {
-    display: block;
-    position: relative;
-    overflow: hidden;
+    display: grid;
+    grid-template-areas: "stack";
     border: 2px solid #333;
     border-radius: 20px;
     text-decoration: none;
-    margin-bottom: 1px;
-    background: #1a1a1a;   /* 画像なし時のデフォルト背景 */
+    background: #1a1a1a;
+    overflow: hidden;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .post-hero img {
+    grid-area: stack;
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     pointer-events: none;
     transition: transform 0.4s ease;
 }
 
-/* 画像なしの場合: .post-hero-text が単独で高さを持つ */
 .post-hero .post-hero-text {
-    min-height: 90px;
-}
-
-/* テキストを画像全体の上に中央寄せで重ねる */
-.post-hero .post-hero-text {
-    position: absolute;
-    inset: 0;                               /* 画像全域を覆う */
+    grid-area: stack;           /* img と同じセルに重なる */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.35);       /* 薄い黒オーバーレイ */
+    padding: 24px 20px;
+    min-height: 90px;           /* 画像なし時の最低高さ */
+    background: rgba(0, 0, 0, 0.40);
     text-align: center;
     transition: background 0.3s ease;
 }
 
 .post-hero:hover .post-hero-text {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.55);
 }
 
 .post-hero .post-hero-text .postdate {
@@ -578,6 +575,7 @@ body {
     font-size: 1.05em;
     line-height: 1.5;
     text-shadow: 0 1px 6px rgba(0,0,0,0.9);
+    word-break: break-word;
 }
 
 .post-hero:hover {
@@ -704,7 +702,7 @@ body {
                     </a>
                     <a class="post-hero" href="https://allheroesband-create.github.io/before_we_stand_up_the_psychdelic_reason/">
                         <!-- 画像を設定する場合: src="" を編集 -->
-                        <img src="before_we_stand_up_the_psychdelic_reason.png" alt="before I stand up the psychedelic reason サイケデリック理性を立ち上げる前に">
+                        <img src="" alt="before I stand up the psychedelic reason サイケデリック理性を立ち上げる前に" style="display:none;">
                         <div class="post-hero-text">
                             <span class="postdate">19.03.26</span>
                             <span class="post-title">before I stand up the psychedelic reason サイケデリック理性を立ち上げる前に</span>
