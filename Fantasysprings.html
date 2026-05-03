@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Springs - SPACESHIP</title>
+
+    <style>
+/* カスタムフォント */
+@font-face {
+    font-family: 'LastChristmas';
+    src: url('LastChristmas.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* --- カーソル：ベース --- */
+body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
+
+/* カーソル本体（ハート） */
+#cursor {
+  position: fixed;
+  left: 0; top: 0;
+  width: 22px; height: 22px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2147483647;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 28 C16 28 4 20 4 12 C4 7 8 4 12 4 C14 4 15 5 16 7 C17 5 18 4 20 4 C24 4 28 7 28 12 C28 20 16 28 16 28 Z' fill='%23ff4d88'/></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 4px rgba(255,80,140,0.95)) drop-shadow(0 0 10px rgba(255,80,140,0.7)) drop-shadow(0 0 18px rgba(255,150,180,0.5));
+  animation: heartBeat 1.4s ease-in-out infinite;
+  will-change: transform, left, top;
+}
+
+/* ハートの鼓動 */
+@keyframes heartBeat {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  15%      { transform: translate(-50%, -50%) scale(1.18); }
+  30%      { transform: translate(-50%, -50%) scale(0.96); }
+  45%      { transform: translate(-50%, -50%) scale(1.08); }
+  60%      { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* 軌跡 */
+.cursor-trail {
+  position: fixed;
+  left: 0; top: 0;
+  width: 6px; height: 6px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2147483646;
+  background: radial-gradient(circle, rgba(255,120,170,0.95), rgba(255,160,190,0.6) 30%, transparent 80%);
+  will-change: transform, opacity;
+  animation: trailFade 900ms cubic-bezier(.22,.9,.3,1) forwards;
+}
+
+/* 軌跡フェード（短めで視認性良く） */
+@keyframes trailFade {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+}
+</style>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        #page {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 3px solid #ffffff;
+            border-radius: 0 0 50% 50% / 0 0 30px 30px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        #header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #ffffff;
+            letter-spacing: 8px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+        }
+
+        #header h1 a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        #header h1 a:hover {
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
+        }
+
+        /* タイトル画像 */
+        #header h1.title-image-wrap {
+            font-size: 0; /* インライン要素の余白対策 */
+            letter-spacing: 0;
+            line-height: 0;
+            margin-bottom: 0;
+        }
+        #header h1.title-image-wrap a {
+            line-height: 0;
+            filter: drop-shadow(0 0 0 transparent);
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        #header h1.title-image-wrap a:hover {
+            text-shadow: none;
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.6));
+        }
+        .title-image {
+            display: block;
+            max-width: 100%;
+            max-height: 200px; /* PCでも画像が暴れないよう上限 */
+            width: auto;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .description {
+            color: #888;
+            font-style: italic;
+        }
+
+        #content {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        #basic-accordian {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .latest-posts {
+            margin-bottom: 30px;
+            background: rgba(26, 26, 26, 0.5);
+            border: 2px solid #333;
+            padding: 20px;
+            border-radius: 30px;
+        }
+
+        .latest-posts h3 {
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+        }
+
+        .latest-post-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #333;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center center;
+            position: relative;
+            text-align: center;
+        }
+
+        .latest-post-item:last-child {
+            border-bottom: none;
+        }
+
+        .latest-post-item:hover {
+            padding-left: 0;
+            border-left: none;
+            transform: scale(1.1) translateZ(20px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.4);
+            z-index: 10;
+            border: 2px solid #ffffff;
+            border-radius: 25px;
+        }
+
+        .latest-post-item .postdate {
+            color: #ffffff;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .latest-post-item a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.3s ease;
+        }
+
+        .latest-post-item a:hover {
+            color: #ffffff;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .square-button {
+            aspect-ratio: 1;
+            background-color: #1a1a1a !important; 
+            border: 2px solid #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: #ffffff; 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Impact', 'Arial Black', sans-serif;
+            padding: 20px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+        }
+
+        .btn-mission-1 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('nivs_sprinter_jacket_sex.png'); 
+        }
+        .btn-mission-2 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('zrky_i8_final_final02.png');
+        }
+        .btn-mission-3 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('radiator_springs_jacket.jpg');
+        }
+        .btn-mission-4 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('IMG_7267.jpg');
+        }
+        .btn-mission-5 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('SUMMER DEATHMATCH_SEASON!1.png');
+        }
+        .btn-mission-6 {
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('IMG_7268.JPG');
+        }
+        .btn-camera-roll {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            font-size: 1em;
+        }
+
+        .square-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .square-button:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+            transform: scale(1.15) translateZ(20px);
+            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+            z-index: 10;
+        }
+
+        .square-button:hover::before {
+            left: 100%;
+        }
+
+        .tab_container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .accordion_headings {
+            flex: 1;
+            padding: 15px 20px;
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 30px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            color: #888;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .accordion_headings:hover {
+            background: #222;
+            border-color: #ffffff;
+        }
+
+        .accordion_headings.header_highlight {
+            background: #ffffff;
+            color: #0a0a0a;
+            border-color: #ffffff;
+        }
+
+        .accordion_child {
+            background: rgba(26, 26, 26, 0.8);
+            border: 2px solid #333;
+            padding: 30px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        #home-content, #menu-content {
+            display: none;
+        }
+
+        #home-content.active, #menu-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .post {
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center center;
+            position: relative;
+            text-align: center;
+        }
+
+        .post:hover {
+            padding-left: 0;
+            border-left: none;
+            transform: scale(1.1) translateZ(20px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.4);
+            z-index: 10;
+            border: 2px solid #ffffff;
+            border-radius: 25px;
+        }
+
+        .post:last-child {
+            border-bottom: none;
+        }
+
+        .postdate {
+            color: #ffffff;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            display: inline-block;
+            min-width: 80px;
+        }
+
+        .post a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .post a:hover {
+            color: #ffffff;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
+            border-radius: 50% 50% 0 0 / 20px 20px 0 0;
+        }
+
+        .navigation a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #ffffff;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+        }
+
+        .navigation a:hover {
+            background: #ffffff;
+            color: #0a0a0a;
+        }
+
+        #archives ul {
+            list-style: none;
+        }
+
+        #archives > ul > li {
+            margin-bottom: 30px;
+        }
+
+        #archives > ul > li > ul {
+            margin-top: 15px;
+        }
+
+        #archives li {
+            margin: 8px 0;
+        }
+
+        #archives a {
+            color: #aaa;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        #archives a:hover {
+            color: #ffffff;
+            padding-left: 10px;
+        }
+
+        .categories, #archives > ul > li:first-child {
+            color: #ffffff;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+
+        .archive-category-btn {
+            background: #1a1a1a;
+            border: 2px solid #333;
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #ffffff;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .archive-category-btn:hover {
+            background: #222;
+            border-color: #ffffff;
+            transform: scale(1.02);
+        }
+
+        .archive-category-btn.active {
+            background: #ffffff;
+            color: #0a0a0a;
+            border-color: #ffffff;
+        }
+
+        .archive-items {
+            display: none;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+        }
+
+        .archive-items.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .archive-items ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .archive-items li {
+            margin: 8px 0;
+        }
+
+        #footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+            border-top: 2px solid #333;
+            border-radius: 50% 50% 0 0 / 30px 30px 0 0;
+            color: #666;
+        }
+
+        #footer a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            #header h1 {
+                font-size: 2em;
+            }
+
+            .title-image {
+                max-height: 120px;
+            }
+
+            .button-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tab_container {
+                flex-direction: column;
+            }
+
+            .navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        /* 背景動画（MP4） */
+        #bg-video {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* =============================================
+           Characters セクション
+           ============================================= */
+        #characters-section {
+            margin-top: 60px;
+            width: 100%;
+        }
+
+        .section-heading {
+            font-family: 'LastChristmas', 'Impact', 'Arial Black', sans-serif;
+            font-size: 2em;
+            color: #ffffff;
+            letter-spacing: 4px;
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+
+        .character-btn {
+            display: block;
+            padding: 18px 20px;
+            background: rgba(26,26,26,0.7);
+            border: 2px solid #333;
+            border-radius: 30px;
+            color: #e0e0e0;
+            font-family: 'Georgia', serif;
+            font-size: 1.1em;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .character-btn:hover {
+            border-color: #ffffff;
+            color: #ffffff;
+            transform: scale(1.03);
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+            background: rgba(40,40,40,0.8);
+        }
+
+        /* =============================================
+           キャラクター紹介モーダル
+           ============================================= */
+        .character-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2147483640;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .character-modal.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .character-modal-panel {
+            position: relative;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            background: linear-gradient(135deg, rgba(20,20,30,0.95), rgba(10,10,20,0.95));
+            border: 2px solid #ffffff;
+            border-radius: 20px;
+            padding: 40px 35px 35px;
+            color: #e0e0e0;
+            box-shadow: 0 0 40px rgba(255,255,255,0.2), 0 0 80px rgba(255,255,255,0.1);
+            transform: translateY(0);
+            transition: transform 0.35s cubic-bezier(.22,.9,.3,1);
+        }
+
+        .character-modal.hidden .character-modal-panel {
+            transform: translateY(-30px);
+        }
+
+        .character-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: transparent;
+            border: none;
+            color: #ffffff;
+            font-size: 2em;
+            line-height: 1;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .character-modal-close:hover {
+            background: rgba(255,255,255,0.15);
+            transform: rotate(90deg);
+        }
+
+        .character-modal-name {
+            font-family: 'LastChristmas', 'Impact', 'Arial Black', sans-serif;
+            font-size: 1.8em;
+            color: #ffffff;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .character-modal-body {
+            font-family: 'Georgia', serif;
+            font-size: 1em;
+            line-height: 1.8;
+            color: #d0d0d0;
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 768px) {
+            .section-heading { font-size: 1.5em; }
+            .character-modal-panel { padding: 35px 25px 25px; }
+            .character-modal-name { font-size: 1.4em; }
+        }
+    </style>
+</head>
+
+<video id="bg-video" autoplay muted loop playsinline aria-hidden="true">
+    <source src="FS_bg.mp4" type="video/mp4">
+</video>
+<div id="cursor" aria-hidden="true"></div>
+
+    <div id="page">
+        <div id="header">
+            <h1 class="title-image-wrap">
+                <a href="FantasySprings.html">
+                    <img src="FS_title.png" alt="Fantasy Springs" class="title-image">
+                </a>
+            </h1>
+        </div>
+
+        <div id="content">
+            <body>
+
+            <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
+
+                <div class="square-button" id="btn-fs1" 
+                     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('FS1.png');" 
+                     onclick="location.href='https://allheroesband-create.github.io/vernal-equinox/'">
+                </div>
+
+                <script>
+                  const imgFS1 = new Image();
+                  imgFS1.src = 'FS1.png';
+                  imgFS1.onload = () => {
+                    document.getElementById('btn-fs1').style.aspectRatio = `${imgFS1.naturalWidth} / ${imgFS1.naturalHeight}`;
+                  };
+                </script>
+
+            </div>
+
+            <!-- ========== Characters セクション ========== -->
+            <div id="characters-section">
+                <h2 class="section-heading">Characters</h2>
+                <div class="character-grid">
+                    <button type="button" class="character-btn" onclick="openCharacterModal('char1')">ヴァル</button>
+                    <button type="button" class="character-btn" onclick="openCharacterModal('char2')">ビッグヌードル</button>
+                    <button type="button" class="character-btn" onclick="openCharacterModal('char3')">ジャック</button>
+                </div>
+            </div>
+
+            <!-- ========== キャラクター紹介データ（hidden、JSが読み取る） ========== -->
+            <div id="character-data" style="display: none;">
+                <div data-char-id="char1" data-char-name="ヴァル">
+                    ここにヴァルの紹介テキストが入ります。年齢、出身、性格、エピソードでの役割など、自由に書き換えてください。改行して長文も書けます。
+                </div>
+                <div data-char-id="char2" data-char-name="ビッグヌードル">
+                    ここにビッグヌードルの紹介テキストが入ります。
+                </div>
+                <div data-char-id="char3" data-char-name="ジャック">
+                    ここにジャックの紹介テキストが入ります。
+                </div>
+            </div>
+
+            <!-- ========== モーダル ========== -->
+            <div id="character-modal" class="character-modal hidden" onclick="closeCharacterModalOnBackdrop(event)">
+                <div class="character-modal-panel">
+                    <button type="button" class="character-modal-close" onclick="closeCharacterModal()" aria-label="Close">×</button>
+                    <h3 class="character-modal-name" id="character-modal-name"></h3>
+                    <div class="character-modal-body" id="character-modal-body"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="footer">
+            <div style="margin-bottom: 30px;">
+                <div class="square-button"
+                     style="display:inline-flex; aspect-ratio:auto; width:200px; height:60px; font-size:1.4em; letter-spacing:4px; border-radius:30px;"
+                     onclick="location.href='https://allheroesband-create.github.io/SPACESHIP/'">
+                    COCKPIT
+                </div>
+            </div>
+            <p>SPACESHIP</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleTab(tab) {
+            const homeHeader = document.getElementById('home-header');
+            const menuHeader = document.getElementById('menu-header');
+            const homeContent = document.getElementById('home-content');
+            const menuContent = document.getElementById('menu-content');
+
+            if (tab === 'home') {
+                homeHeader.classList.add('header_highlight');
+                menuHeader.classList.remove('header_highlight');
+                homeContent.classList.add('active');
+                menuContent.classList.remove('active');
+            } else {
+                menuHeader.classList.add('header_highlight');
+                homeHeader.classList.remove('header_highlight');
+                menuContent.classList.add('active');
+                homeContent.classList.remove('active');
+            }
+        }
+
+        function toggleArchiveCategory(category) {
+            const itemsDiv = document.getElementById(category + '-items');
+            const button = event.target;
+            
+            if (itemsDiv.classList.contains('show')) {
+                itemsDiv.classList.remove('show');
+                button.classList.remove('active');
+            } else {
+                itemsDiv.classList.add('show');
+                button.classList.add('active');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('home-content') && document.getElementById('home-content').classList.add('active');
+        });
+    </script>
+
+    <!-- ========== キャラクター紹介モーダル ========== -->
+    <script>
+        function openCharacterModal(charId) {
+            const dataEl = document.querySelector(`#character-data [data-char-id="${charId}"]`);
+            if (!dataEl) return;
+            const name = dataEl.getAttribute('data-char-name') || '';
+            const body = dataEl.textContent.trim();
+            document.getElementById('character-modal-name').textContent = name;
+            document.getElementById('character-modal-body').textContent = body;
+            const modal = document.getElementById('character-modal');
+            modal.classList.remove('hidden');
+            // ページ背後のスクロールをロック
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCharacterModal() {
+            const modal = document.getElementById('character-modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function closeCharacterModalOnBackdrop(event) {
+            // パネル外（背景）をクリックした時だけ閉じる
+            if (event.target.id === 'character-modal') {
+                closeCharacterModal();
+            }
+        }
+
+        // ESCキーでも閉じられるように
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('character-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    closeCharacterModal();
+                }
+            }
+        });
+    </script>
+
+    <script>
+(function(){
+  const cursor = document.getElementById('cursor');
+  if(!cursor) return;
+
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let cursorX = mouseX, cursorY = mouseY;
+
+  const minInterval = 40;
+  let lastTrailTime = 0;
+  const maxTrails = 60;
+  let activeTrails = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX; mouseY = e.clientY;
+
+    const now = performance.now();
+    if(now - lastTrailTime >= minInterval && activeTrails < maxTrails){
+      spawnTrail(mouseX, mouseY);
+      lastTrailTime = now;
+    }
+  }, { passive: true });
+
+  function onTouch(e){
+    if(!e) return;
+    const t = e.touches && e.touches[0];
+    if(!t) return;
+    mouseX = t.clientX; mouseY = t.clientY;
+    const now = performance.now();
+    if(now - lastTrailTime >= minInterval && activeTrails < maxTrails){
+      spawnTrail(mouseX, mouseY);
+      lastTrailTime = now;
+    }
+  }
+  document.addEventListener('touchstart', onTouch, { passive: true });
+  document.addEventListener('touchmove', onTouch, { passive: true });
+
+  function updateLoop(){
+    cursorX += (mouseX - cursorX) * 0.22;
+    cursorY += (mouseY - cursorY) * 0.22;
+    cursor.style.left = cursorX + 'px';
+    cursor.style.top = cursorY + 'px';
+    requestAnimationFrame(updateLoop);
+  }
+  requestAnimationFrame(updateLoop);
+
+  function spawnTrail(x, y){
+    const el = document.createElement('div');
+    el.className = 'cursor-trail';
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+
+    const s = 4 + Math.random() * 6;
+    el.style.width = s + 'px';
+    el.style.height = s + 'px';
+    el.style.opacity = (0.7 + Math.random()*0.3).toString();
+
+    document.body.appendChild(el);
+    activeTrails++;
+
+    const life = 1000;
+    setTimeout(()=>{
+      if(el && el.parentNode) el.parentNode.removeChild(el);
+      activeTrails = Math.max(0, activeTrails - 1);
+    }, life + 50);
+  }
+
+  window.__cursorTrailStatus = () => ({ mouseX, mouseY, cursorX, cursorY, activeTrails });
+})();
+    </script>
+
+</body>
+</html>
