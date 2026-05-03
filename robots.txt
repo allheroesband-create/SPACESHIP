@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://allheroesband-create.github.io/SPACESHIP/sitemap.xml
