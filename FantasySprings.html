@@ -576,6 +576,112 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         }
 
         /* =============================================
+           post-hero: 画像背景＋テキストオーバーレイ投稿
+           img と .post-hero-text を CSS Grid で同セルに重ねる。
+           ============================================= */
+        .post-hero {
+            display: grid;
+            grid-template-areas: "stack";
+            border: 2px solid #333;
+            border-radius: 20px;
+            text-decoration: none;
+            background: #1a1a1a;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .post-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transition: left 0.55s ease;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .post-hero:hover::before {
+            left: 100%;
+        }
+
+        .post-hero img {
+            grid-area: stack;
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            z-index: 0;
+            transition: transform 0.4s ease;
+        }
+
+        .post-hero .post-hero-text {
+            grid-area: stack;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 24px 20px;
+            min-height: 90px;
+            background: rgba(0, 0, 0, 0.40);
+            text-align: center;
+            z-index: 1;
+            transition: background 0.3s ease;
+        }
+
+        .post-hero:hover .post-hero-text {
+            background: rgba(0, 0, 0, 0.52);
+        }
+
+        .post-hero .post-hero-text .postdate {
+            display: block;
+            font-size: 0.95em;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow:
+                0 0 8px  rgba(0,0,0,1),
+                0 0 16px rgba(0,0,0,0.9),
+                1px  1px 0 rgba(0,0,0,1),
+                -1px -1px 0 rgba(0,0,0,1),
+                1px -1px 0 rgba(0,0,0,1),
+                -1px  1px 0 rgba(0,0,0,1);
+        }
+
+        .post-hero .post-hero-text .post-title {
+            color: #ffffff;
+            font-family: 'Georgia', serif;
+            font-size: 1.4em;
+            line-height: 1.4;
+            letter-spacing: 1px;
+            word-break: break-word;
+            text-shadow:
+                0 0 8px  rgba(0,0,0,1),
+                0 0 20px rgba(0,0,0,0.9),
+                1px  1px 0 rgba(0,0,0,1),
+                -1px -1px 0 rgba(0,0,0,1),
+                1px -1px 0 rgba(0,0,0,1),
+                -1px  1px 0 rgba(0,0,0,1);
+        }
+
+        .post-hero:hover {
+            border-color: #ffffff;
+            transform: scale(1.02);
+            box-shadow: 0 10px 40px rgba(255,255,255,0.4);
+            z-index: 10;
+        }
+
+        .post-hero:hover img {
+            transform: scale(1.03);
+        }
+
+        /* =============================================
            Characters セクション
            ============================================= */
         #characters-section {
@@ -733,18 +839,13 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 
             <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
 
-                <div class="square-button" id="btn-fs1" 
-                     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('FS1.png');" 
-                     onclick="location.href='https://allheroesband-create.github.io/vernal-equinox/'">
-                </div>
-
-                <script>
-                  const imgFS1 = new Image();
-                  imgFS1.src = 'FS1.png';
-                  imgFS1.onload = () => {
-                    document.getElementById('btn-fs1').style.aspectRatio = `${imgFS1.naturalWidth} / ${imgFS1.naturalHeight}`;
-                  };
-                </script>
+                <a class="post-hero" href="https://allheroesband-create.github.io/vernal-equinox/">
+                    <img src="vernal-equinox.png" alt="#1 Vernal Equinox">
+                    <div class="post-hero-text">
+                        <span class="postdate">#1</span>
+                        <span class="post-title">Vernal Equinox</span>
+                    </div>
+                </a>
 
             </div>
 
