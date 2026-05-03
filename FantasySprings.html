@@ -62,6 +62,45 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
 }
+
+/* =============================================
+   オープニング映像オーバーレイ
+   ============================================= */
+#intro-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 2147483646; /* カーソルより下、それ以外より上 */
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.8s ease;
+    cursor: none;
+}
+#intro-overlay.fade-out { opacity: 0; }
+#intro-overlay.hidden   { display: none; }
+#intro-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+#intro-skip-hint {
+    position: absolute;
+    bottom: 24px;
+    right: 28px;
+    color: rgba(255,255,255,0.5);
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+    pointer-events: none;
+    animation: skipHintFade 4s ease-in-out infinite;
+}
+@keyframes skipHintFade {
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 0.8; }
+}
 </style>
 
     <style>
@@ -146,10 +185,9 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             font-style: italic;
             font-size: 1.1em;
             font-weight: 300;
-            color: rgba(255, 255, 255, 0.85);
+            color: #000000;
             letter-spacing: 4px;
             text-align: center;
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
         }
 
         .description {
@@ -692,12 +730,12 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         .section-heading {
             font-family: 'LastChristmas', 'Impact', 'Arial Black', sans-serif;
             font-size: 2em;
-            color: #ffffff;
+            color: #000000;
             letter-spacing: 4px;
             text-align: center;
             margin-bottom: 25px;
             padding-bottom: 12px;
-            border-bottom: 2px solid rgba(255,255,255,0.3);
+            border-bottom: 2px solid rgba(0,0,0,0.3);
         }
 
         .character-grid {
@@ -822,6 +860,14 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 <video id="bg-video" autoplay muted loop playsinline aria-hidden="true">
     <source src="FS_bg.mp4" type="video/mp4">
 </video>
+
+<div id="intro-overlay">
+    <video id="intro-video" autoplay muted playsinline preload="auto">
+        <source src="FS_intro.mp4" type="video/mp4">
+    </video>
+    <div id="intro-skip-hint">CLICK TO SKIP</div>
+</div>
+
 <div id="cursor" aria-hidden="true"></div>
 
     <div id="page">
@@ -1041,6 +1087,58 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   }
 
   window.__cursorTrailStatus = () => ({ mouseX, mouseY, cursorX, cursorY, activeTrails });
+})();
+    </script>
+
+    <!-- ========== オープニング映像オーバーレイ ========== -->
+    <script>
+(function(){
+    const overlay = document.getElementById('intro-overlay');
+    const video   = document.getElementById('intro-video');
+    if (!overlay || !video) return;
+
+    let dismissed = false;
+
+    function dismiss() {
+        if (dismissed) return;
+        dismissed = true;
+        overlay.classList.add('fade-out');
+        // フェードアウト完了後にDOMから外す
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            // 動画リソースを解放
+            try { video.pause(); video.removeAttribute('src'); video.load(); } catch(e) {}
+        }, 850);
+    }
+
+    // 動画が再生し終わったら自動でフェードアウト
+    video.addEventListener('ended', dismiss);
+
+    // クリック/タップでスキップ
+    overlay.addEventListener('click', dismiss);
+    overlay.addEventListener('touchstart', dismiss, { passive: true });
+
+    // ESCキーでもスキップ
+    document.addEventListener('keydown', function(e) {
+        if (!dismissed && (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter')) {
+            dismiss();
+        }
+    });
+
+    // 動画ファイルがロード失敗 / 存在しない場合は即座に消す（ページが永遠に隠れるのを防ぐ）
+    video.addEventListener('error', dismiss);
+
+    // 万一、何らかの理由で30秒経ってもended が来なかった場合のフォールバック
+    setTimeout(dismiss, 30000);
+
+    // 自動再生がブラウザにブロックされた場合の保険
+    const playPromise = video.play();
+    if (playPromise && playPromise.catch) {
+        playPromise.catch(() => {
+            // 自動再生がブロックされたら、オーバーレイを早めに消してページを見せる
+            setTimeout(dismiss, 500);
+        });
+    }
 })();
     </script>
 
