@@ -533,8 +533,22 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
 
                 <div class="square-button" id="btn" 
+                     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('aokosen.png');" 
+                     onclick="location.href='https://allheroesband-create.github.io/QC2aokosen/'">
+                </div>
+
+                <script>
+                  const img = new Image();
+                  img.src = 'aokosen.png';
+                  img.onload = () => {
+                    document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+                  };
+                    
+                </script>
+
+                  <div class="square-button" id="btn" 
                      style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC1.png');" 
-                     onclick="location.href='https://allheroesband-create.github.io/QC1jyosetsu/'">
+                     onclick="location.href='https://allheroesband-create.github.io/QC2aokosen/'">
                 </div>
 
                 <script>
@@ -543,7 +557,9 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
                   img.onload = () => {
                     document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
                   };
+                    
                 </script>
+
 
             </div>
 
