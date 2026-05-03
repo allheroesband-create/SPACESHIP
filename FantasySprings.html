@@ -626,6 +626,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             background: #1a1a1a;
             overflow: hidden;
             position: relative;
+            aspect-ratio: 1366 / 100; /* #1 vernal-equinox.png に合わせた比率 */
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -663,9 +664,9 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 24px 20px;
-            min-height: 90px;
+            gap: 4px;
+            padding: 12px 20px;
+            min-height: 0;
             background: rgba(0, 0, 0, 0.40);
             text-align: center;
             z-index: 1;
@@ -916,13 +917,13 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             <!-- ========== キャラクター紹介データ（hidden、JSが読み取る） ========== -->
             <div id="character-data" style="display: none;">
                 <div data-char-id="char1" data-char-name="ヴァル">
-                    あるとき地球の空から降ってきた少年。ビックヌードルの迎撃システムにより二つに分裂し、ひとつは宇宙を飛び回り、もうひとつは地球の核にある。その２つの焦点を持って銀河にお絵描きを始めた。
+                    ここにヴァルの紹介テキストが入ります。年齢、出身、性格、エピソードでの役割など、自由に書き換えてください。改行して長文も書けます。
                 </div>
                 <div data-char-id="char2" data-char-name="ビッグヌードル">
-                    地球で生まれた超知能コンピュータ。地球を覆い尽くしコントロールしている。
+                    ここにビッグヌードルの紹介テキストが入ります。
                 </div>
                 <div data-char-id="char3" data-char-name="ジャック">
-                    サンフランシスコのバークレーにガールフレンドのシルヴィアと共に住む青年。
+                    ここにジャックの紹介テキストが入ります。
                 </div>
             </div>
 
