@@ -16,7 +16,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   width: 14px; height: 14px;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  z-index: 2147483647; /* 最前面 */
+  z-index: 2147483647;
   background: radial-gradient(circle, #fff 0%, #fff 40%, #ffeecc 70%, transparent 100%);
   box-shadow: 0 0 12px #fff, 0 0 24px #fff, 0 0 36px #ffeecc;
   clip-path: polygon(50% 0%,62.5% 28.4%,93.3% 25%,75% 50%,93.3% 75%,62.5% 71.7%,50% 100%,37.5% 71.7%,6.7% 75%,25% 50%,6.7% 25%,37.5% 28.4%);
@@ -25,7 +25,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   pointer-events: none;
 }
 
-/* 六芒星のゆらぎ */
 @keyframes starMorph {
   0%,100% { clip-path: polygon(50% 0%,62.5% 28.4%,93.3% 25%,75% 50%,93.3% 75%,62.5% 71.7%,50% 100%,37.5% 71.7%,6.7% 75%,25% 50%,6.7% 25%,37.5% 28.4%); }
   25%      { clip-path: polygon(50% 2%,64% 27%,94% 23%,77% 50%,94% 77%,64% 74%,50% 98%,36% 74%,6% 77%,23% 50%,6% 23%,36% 27%); }
@@ -33,7 +32,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   75%      { clip-path: polygon(50% 1%,63% 29%,95% 24%,76% 50%,95% 76%,63% 73%,50% 99%,37% 73%,5% 76%,24% 50%,5% 24%,37% 29%); }
 }
 
-/* 軌跡 */
 .cursor-trail {
   position: fixed;
   left: 0; top: 0;
@@ -47,12 +45,11 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   animation: trailFade 900ms cubic-bezier(.22,.9,.3,1) forwards;
 }
 
-/* 軌跡フェード（短めで視認性良く） */
 @keyframes trailFade {
   0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
 }
-</style>
+    </style>
 
     <style>
         * {
@@ -190,7 +187,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 
         .square-button {
             aspect-ratio: 1;
-            background-color: #1a1a1a !important; 
+            background-color: #1a1a1a !important;
             border: 2px solid #333;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -198,7 +195,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             align-items: center;
             justify-content: center;
             font-size: 1.2em;
-            color: #ffffff; 
+            color: #ffffff;
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
@@ -209,29 +206,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             letter-spacing: 2px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             border-radius: 15px;
-        }
-
-        .btn-mission-1 {
-            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('nivs_sprinter_jacket_sex.png'); 
-        }
-        .btn-mission-2 {
-            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('zrky_i8_final_final02.png');
-        }
-        .btn-mission-3 {
-            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('radiator_springs_jacket.jpg');
-        }
-        .btn-mission-4 {
-            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('IMG_7267.jpg');
-        }
-        .btn-mission-5 {
-            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('SUMMER DEATHMATCH_SEASON!1.png');
-        }
-        .btn-mission-6 {
-            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('IMG_7268.JPG');
-        }
-        .btn-camera-roll {
-            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
-            font-size: 1em;
         }
 
         .square-button::before {
@@ -307,14 +281,8 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .post {
@@ -383,21 +351,10 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             color: #0a0a0a;
         }
 
-        #archives ul {
-            list-style: none;
-        }
-
-        #archives > ul > li {
-            margin-bottom: 30px;
-        }
-
-        #archives > ul > li > ul {
-            margin-top: 15px;
-        }
-
-        #archives li {
-            margin: 8px 0;
-        }
+        #archives ul { list-style: none; }
+        #archives > ul > li { margin-bottom: 30px; }
+        #archives > ul > li > ul { margin-top: 15px; }
+        #archives li { margin: 8px 0; }
 
         #archives a {
             color: #aaa;
@@ -463,14 +420,8 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             animation: fadeIn 0.3s ease;
         }
 
-        .archive-items ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .archive-items li {
-            margin: 8px 0;
-        }
+        .archive-items ul { list-style: none; padding: 0; }
+        .archive-items li { margin: 8px 0; }
 
         #footer {
             text-align: center;
@@ -487,25 +438,12 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         }
 
         @media (max-width: 768px) {
-            #header h1 {
-                font-size: 2em;
-            }
-
-            .button-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .tab_container {
-                flex-direction: column;
-            }
-
-            .navigation {
-                flex-direction: column;
-                gap: 10px;
-            }
+            #header h1 { font-size: 2em; }
+            .button-grid { grid-template-columns: repeat(2, 1fr); }
+            .tab_container { flex-direction: column; }
+            .navigation { flex-direction: column; gap: 10px; }
         }
 
-        /* ★修正①：opacity: 0 → 1 に変更 */
         #bg-gif {
             position: fixed;
             inset: 0;
@@ -519,6 +457,8 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
     </style>
 </head>
 
+<body>
+
 <div id="bg-gif" aria-hidden="true"></div>
 <div id="cursor" aria-hidden="true"></div>
 
@@ -528,60 +468,48 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         </div>
 
         <div id="content">
-            <body>
+            <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
 
-                
-                <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
-
-                <div class="square-button" id="btn" 
-                     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC0.png');" 
+                <div class="square-button" id="btn-qc0"
+                     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC0.png');"
                      onclick="location.href='https://allheroesband-create.github.io/QCjyosetsu0/'">
                 </div>
 
                 <script>
-                  const img = new Image();
-                  img.src = 'QC0.png';
-                  img.onload = () => {
-                    document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+                  const imgQC0 = new Image();
+                  imgQC0.src = 'QC0.png';
+                  imgQC0.onload = () => {
+                    document.getElementById('btn-qc0').style.aspectRatio = `${imgQC0.naturalWidth} / ${imgQC0.naturalHeight}`;
                   };
-                    
                 </script>
-          </div>           
-            <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
 
-                <div class="square-button" id="btn" 
-                     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('aokosen.png');" 
+                <div class="square-button" id="btn-aokosen"
+                     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('aokosen.png');"
                      onclick="location.href='https://allheroesband-create.github.io/QC2aokosen/'">
                 </div>
 
                 <script>
-                  const img = new Image();
-                  img.src = 'aokosen.png';
-                  img.onload = () => {
-                    document.getElementById('btn').style.aspectRatio = `${img.naturalWidth} / ${img.naturalHeight}`;
+                  const imgAokosen = new Image();
+                  imgAokosen.src = 'aokosen.png';
+                  imgAokosen.onload = () => {
+                    document.getElementById('btn-aokosen').style.aspectRatio = `${imgAokosen.naturalWidth} / ${imgAokosen.naturalHeight}`;
                   };
-                    
                 </script>
-            </div>
 
-            <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
+                <div class="square-button" id="btn-qc1"
+                     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC1.png');"
+                     onclick="location.href='https://allheroesband-create.github.io/QC1jyosetsu/'">
+                </div>
 
-                  <div class="square-button" id="btn2" 
-     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC1.png');" 
-     onclick="location.href='https://allheroesband-create.github.io/QC1jyosetsu/'">
-</div>
-
-<script>
-  const img2 = new Image();
-  img2.src = 'QC1.png';
-  img2.onload = () => {
-    document.getElementById('btn2').style.aspectRatio = `${img2.naturalWidth} / ${img2.naturalHeight}`;
-  };
-</script>
-
+                <script>
+                  const imgQC1 = new Image();
+                  imgQC1.src = 'QC1.png';
+                  imgQC1.onload = () => {
+                    document.getElementById('btn-qc1').style.aspectRatio = `${imgQC1.naturalWidth} / ${imgQC1.naturalHeight}`;
+                  };
+                </script>
 
             </div>
-
         </div>
 
         <div id="footer">
@@ -619,7 +547,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         function toggleArchiveCategory(category) {
             const itemsDiv = document.getElementById(category + '-items');
             const button = event.target;
-            
             if (itemsDiv.classList.contains('show')) {
                 itemsDiv.classList.remove('show');
                 button.classList.remove('active');
@@ -630,7 +557,8 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('home-content') && document.getElementById('home-content').classList.add('active');
+            const homeContent = document.getElementById('home-content');
+            if (homeContent) homeContent.classList.add('active');
         });
     </script>
 
@@ -650,7 +578,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 
   document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX; mouseY = e.clientY;
-
     const now = performance.now();
     if(now - lastTrailTime >= minInterval && activeTrails < maxTrails){
       spawnTrail(mouseX, mouseY);
@@ -686,20 +613,16 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
     el.className = 'cursor-trail';
     el.style.left = x + 'px';
     el.style.top = y + 'px';
-
     const s = 4 + Math.random() * 6;
     el.style.width = s + 'px';
     el.style.height = s + 'px';
     el.style.opacity = (0.7 + Math.random()*0.3).toString();
-
     document.body.appendChild(el);
     activeTrails++;
-
-    const life = 1000;
     setTimeout(()=>{
       if(el && el.parentNode) el.parentNode.removeChild(el);
       activeTrails = Math.max(0, activeTrails - 1);
-    }, life + 50);
+    }, 1050);
   }
 
   window.__cursorTrailStatus = () => ({ mouseX, mouseY, cursorX, cursorY, activeTrails });
