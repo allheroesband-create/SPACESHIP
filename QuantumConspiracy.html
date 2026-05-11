@@ -468,7 +468,21 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         </div>
 
         <div id="content">
+           
             <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
+
+               <div class="square-button" id="btn-HowManyMoreTimes"
+                     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('HowManyMoreTimes.png');"
+                     onclick="location.href='https://allheroesband-create.github.io/HowManyMoreTimes/'">
+                </div>
+
+                <script>
+                  const imgQC0 = new Image();
+                  imgQC0.src = 'HowManyMoreTimes.png';
+                  imgQC0.onload = () => {
+                    document.getElementById('btn-qc0').style.aspectRatio = `${imgQC0.naturalWidth} / ${imgQC0.naturalHeight}`;
+                  };
+                </script>
 
                 <div class="square-button" id="btn-qc0"
                      style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('QC0.png');"
