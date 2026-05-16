@@ -16,7 +16,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   width: 14px; height: 14px;
   transform: translate(-50%, -50%);
   pointer-events: none;
-  z-index: 2147483647; /* 最前面 */
+  z-index: 2147483647;
   background: radial-gradient(circle, #fff 0%, #fff 40%, #ffeecc 70%, transparent 100%);
   box-shadow: 0 0 12px #fff, 0 0 24px #fff, 0 0 36px #ffeecc;
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
@@ -25,7 +25,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   pointer-events: none;
 }
 
-/* 五芒星のゆらぎ */
 @keyframes starMorph {
   0%,100% { clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
   25%      { clip-path: polygon(50% 2%, 62% 36%, 97% 36%, 69% 58%, 80% 92%, 50% 71%, 20% 92%, 31% 58%, 3% 36%, 38% 36%); }
@@ -33,7 +32,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   75%      { clip-path: polygon(50% 1%, 62% 35%, 99% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 1% 35%, 38% 35%); }
 }
 
-/* 軌跡 */
 .cursor-trail {
   position: fixed;
   left: 0; top: 0;
@@ -47,7 +45,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
   animation: trailFade 900ms cubic-bezier(.22,.9,.3,1) forwards;
 }
 
-/* 軌跡フェード（短めで視認性良く） */
 @keyframes trailFade {
   0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
@@ -190,7 +187,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
 
         .square-button {
             aspect-ratio: 1;
-            background-color: #1a1a1a !important; 
+            background-color: #1a1a1a !important;
             border: 2px solid #333;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -198,7 +195,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             align-items: center;
             justify-content: center;
             font-size: 1.2em;
-            color: #ffffff; 
+            color: #ffffff;
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
@@ -212,7 +209,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         }
 
         .btn-mission-1 {
-            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('nivs_sprinter_jacket_sex.png'); 
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('nivs_sprinter_jacket_sex.png');
         }
         .btn-mission-2 {
             background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('zrky_i8_final_final02.png');
@@ -505,7 +502,6 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
             }
         }
 
-        /* ★修正①：opacity: 0 → 1 に変更 */
         #bg-gif {
             position: fixed;
             inset: 0;
@@ -530,21 +526,33 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         <div id="content">
             <body>
 
-            <div style="display: flex; flex-direction: column; gap: 20px; width: 100%;">
+            <div style="display: flex; flex-direction: row; gap: 20px; width: 100%;">
 
-                  <div class="square-button" id="btn2" 
-     style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('SK2.JPEG');" 
-     onclick="location.href='https://allheroesband-create.github.io/syueikoudou1/'">
-</div>
+                <div class="square-button" id="btn2"
+                     style="width: 25%; flex-shrink: 0; background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('SK2.JPEG');"
+                     onclick="location.href='https://allheroesband-create.github.io/syueikoudou1/'">
+                </div>
 
-<script>
-  const img2 = new Image();
-  img2.src = 'SK2.JPEG';
-  img2.onload = () => {
-    document.getElementById('btn2').style.aspectRatio = `${img2.naturalWidth} / ${img2.naturalHeight}`;
-  };
-</script>
+                <script>
+                  const img2 = new Image();
+                  img2.src = 'SK2.JPEG';
+                  img2.onload = () => {
+                    document.getElementById('btn2').style.aspectRatio = `${img2.naturalWidth} / ${img2.naturalHeight}`;
+                  };
+                </script>
 
+                <div class="square-button" id="btn3"
+                     style="width: 25%; flex-shrink: 0; background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('SK4.png');"
+                     onclick="location.href='https://allheroesband-create.github.io/syueikoudou2/'">
+                </div>
+
+                <script>
+                  const img3 = new Image();
+                  img3.src = 'SK4.png';
+                  img3.onload = () => {
+                    document.getElementById('btn3').style.aspectRatio = `${img3.naturalWidth} / ${img3.naturalHeight}`;
+                  };
+                </script>
 
             </div>
 
@@ -585,7 +593,7 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
         function toggleArchiveCategory(category) {
             const itemsDiv = document.getElementById(category + '-items');
             const button = event.target;
-            
+
             if (itemsDiv.classList.contains('show')) {
                 itemsDiv.classList.remove('show');
                 button.classList.remove('active');
