@@ -556,6 +556,20 @@ body { cursor: none; margin:0; background:#0a0a0a; color:#e0e0e0; }
                   };
                 </script>
 
+                <!-- ★ sirat 記事ボタン追加 -->
+                <div class="square-button" id="btn4"
+                     style="width: 25%; flex-shrink: 0; background-image: linear-gradient(rgba(0,0,0,0.05), rgba(0,0,0,0.05)), url('SK3.png');"
+                     onclick="location.href='https://allheroesband-create.github.io/sirat/'">
+                </div>
+
+                <script>
+                  const img4 = new Image();
+                  img4.src = 'SK3.png';
+                  img4.onload = () => {
+                    document.getElementById('btn4').style.aspectRatio = `${img4.naturalWidth} / ${img4.naturalHeight}`;
+                  };
+                </script>
+
             </div>
 
         </div>
